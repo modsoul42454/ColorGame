@@ -92,6 +92,7 @@ class playGame extends Phaser.Scene {
         this.dragScale = this.plugins.get('rexpinchplugin').add(this);
         var camera = this.cameras.main;
         this.pinch_zoom_flag = false
+        this.dragScale.dragThreshold = 1
         this.dragScale
             .on('pinch', function (dragScale) {
                 if (!this.dragObj === null) {
@@ -101,7 +102,7 @@ class playGame extends Phaser.Scene {
                 }
                 var scaleFactor = dragScale.scaleFactor;
                 camera.zoom *= scaleFactor;
-                console.log(camera.scrollX)
+                // console.log(camera.scrollX)
                 var drag1Vector = dragScale.drag1Vector;
                 camera.scrollX -= drag1Vector.x / camera.zoom;
                 camera.scrollY -= drag1Vector.y / camera.zoom;
@@ -123,7 +124,7 @@ class playGame extends Phaser.Scene {
                 var g = (ii + jj) / (sq_size * 2)
                 var b = jj / num_y * 255
                 var hex_c = rgbToHex(r, g, b)
-                // console.log(hex)
+                // // console.log(hex)
                 // var r1 = this.add.rectangle(init_x + ii*sq_size, init_y + jj*sq_size, sq_size, sq_size, 0x6666ff );
                 var rect1 = this.add.rectangle(init_x + ii * (spacer), init_y + jj * spacer, sq_size, sq_size, hex_c);
                 // var group = this.add.container()
@@ -153,7 +154,7 @@ class playGame extends Phaser.Scene {
 
         this.input.on('pointerdown', this.PointerDown, this)
         // this.input.on('pointer2down', this.pointer2_down, this)
-        reload_data = false
+        reload_data = true
         if (reload_data) {
             var recover_array = JSON.parse(localStorage.getItem('Array'))
             var recover_text_marking_array = JSON.parse(localStorage.getItem('text_array'))
@@ -221,7 +222,7 @@ class playGame extends Phaser.Scene {
                         }
                     }
                 }
-            console.log(count)
+            // console.log(count)
             var string_data = JSON.stringify(this.array_text)
             localStorage.setItem('text_array', string_data)
             localStorage.setItem('array_text_ii', JSON.stringify(array_text_ii))
@@ -233,10 +234,11 @@ class playGame extends Phaser.Scene {
 
 
     pointer2_down() {
-        console.log('Pointer 2 down')
+        // console.log('Pointer 2 down')
     }
     PointerDown(pointer, targets) {
-        console.log('isPinched' + this.dragScale.isPinched)
+
+        // console.log('isPinched' + this.dragScale.isPinched)
         if (this.input.pointer1.active && !this.input.pointer2.active && !this.dragScale.isPinched) {
             if (targets[0] != null) {
 
@@ -246,20 +248,47 @@ class playGame extends Phaser.Scene {
 
                 this.rect1 = this.dragObj
                 this.rect1.on('drag', (pointer, dragX, dragY) => {
-                    if (!this.dragScale.isPinched){
-                    console.log('Draggin')
-                    this.rect1.x = dragX
-                    this.rect1.y = dragY
-                    // var drag1Vector = dragScale.drag1Vector;
-                    // camera.scrollX -= drag1Vector.x / camera.zoom;
-                    // camera.scrollY -= drag1Vector.y / camera.zoom;
-                    this.rect1.depth = 100}
+                    if (!this.dragScale.isPinched) {
+                        // console.log('Draggin')
+                        this.rect1.x = dragX
+                        this.rect1.y = dragY
+                        // var drag1Vector = dragScale.drag1Vector;
+                        // camera.scrollX -= drag1Vector.x / camera.zoom;
+                        // camera.scrollY -= drag1Vector.y / camera.zoom;
+                        this.rect1.depth = 100
+                    }
                 });
                 this.rect1.on('dragend', (pointer, dragX, dragY) => {
-                    console.log('end draggin')
+                    // console.log('end draggin')
                     this.rect1.depth = 1
                     this.find_and_swap(this.rect1)
                 })
+
+                // this.rect1.on('pointerdown', (pointer, localx, localy) => {
+
+                //     this.dragObj = targets[0]
+
+
+                //     if (this.selected == null) {
+                //         this.selected = this.rect1
+                //         this.selected.alpha = 0.3
+                //         console.log('rect selected = ' + this.selected)
+                        
+                //     }
+                //     else if (this.selected === this.dragObj)
+                //     {
+
+                //     }
+                //     else
+                //     {
+                //         this.selected.x = this.dragObj.x
+                //         this.selected.y = this.dragObj.y
+                //         this.find_and_swap(this.selected)
+                        
+                //         this.selected.alpha = 1
+                //         this.selected = null
+                //     }
+                // })
 
 
 
@@ -267,62 +296,8 @@ class playGame extends Phaser.Scene {
             }
         }
 
-        // if (this.input.pointer1.active && this.input.pointer2.active) {
-
-        //     console.log("both pointers active")
-        //     this.dragObj = targets[0]
-
-        //     var rect1 = this.dragObj
-        //     rect1.off('drag', (pointer, dragX, dragY) => {
-        //         console.log('Draggin')
-        //         rect1.x = dragX
-        //         rect1.y = dragY
-        //     });
-        //     rect1.off('dragend', (pointer, dragX, dragY) => {
-        //         console.log('end draggin')
-        //         this.find_and_swap(rect1)
-        //     })
-
-        //     this.dragObj.x = this.dragObj.last_pos_x
-        //     this.dragObj.y = this.dragObj.last_pos_y
-        //     // this.input.off('pointermove', this.doDrag, this)
-        //     // this.input.off('pointerup', this.stopDrag, this)
-        // }
     }
 
-    // doDrag(pointer) {
-    //     var rect1 = this.dragObj
-    //     rect1.on('drag',(pointer,dragX,dragY) => {
-    //         console.log('Draggin')
-    //         rect1.x = dragX
-    //         rect1.y = dragY
-    //     });
-    //     rect1.on('dragend', (pointer, dragX, dragY) =>{
-    //         console.log('end draggin')
-    //         this.find_and_swap(rect1)
-    //     });
-
-
-    //     if (this.input.pointer1.active && this.input.pointer2.active) {
-    //     //     console.log("both pointers active")
-    //     //     this.dragObj.x = this.dragObj.last_pos_x
-    //     //     this.dragObj.y = this.dragObj.last_pos_y
-    //     //     this.input.off('pointermove', this.doDrag, this)
-    //     //     this.input.off('pointerup', this.stopDrag, this)
-    //     }
-
-    // }
-
-    // stopDrag(pointer, targets) {
-    //     this.input.on('pointerdown', this.PointerDown, this)
-    //     this.dragObj.depth = 0
-    //     this.input.off('pointermove', this.doDrag, this)
-    //     this.input.off('pointerup', this.stopDrag, this)
-
-
-
-    //     this.find_and_swap(this.dragObj)
-    // }
 
     find_and_swap(rect_in) {
 
@@ -355,8 +330,8 @@ class playGame extends Phaser.Scene {
             rect_in.last_pos_x = rect_in.x
             rect_in.last_pos_y = rect_in.y
 
-            // console.log(intersected_array)
-            // console.log(rect_in)
+            // // console.log(intersected_array)
+            // // console.log(rect_in)
 
         }
         else {
@@ -394,7 +369,7 @@ class playGame extends Phaser.Scene {
     }
 
     update() {
-       
+
     }
 
 
