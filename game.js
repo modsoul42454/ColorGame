@@ -186,6 +186,7 @@ class playGame extends Phaser.Scene {
         var camera = this.cameras.main;
         this.pinch_zoom_flag = false
         this.dragScale.dragThreshold = 1
+        this.frameTime = 0
         this.dragScale
             .on('pinch', function (dragScale) {
                 if (!this.dragObj === null) {
@@ -472,6 +473,8 @@ class playGame extends Phaser.Scene {
         var intersected_array;
         this.compute_score_and_save();
 
+        var string_data = JSON.stringify(array_rects);
+        localStorage.setItem('Array', string_data);
         // recover_array = JSON.parse(string_data)
     }
 
@@ -497,13 +500,18 @@ class playGame extends Phaser.Scene {
 
         this.events.emit('addScore', str_score);
         // array_rects )
-        var string_data = JSON.stringify(array_rects);
-        localStorage.setItem('Array', string_data);
+
         
     }
 
-    update() {
+    update(time, delta) {
+        this.frameTime += delta
+
+    if (this.frameTime > 16.5) {  
         this.compute_score_and_save()
+        this.frameTime = 0
+
+    }
     }
 
 
