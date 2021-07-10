@@ -7,7 +7,7 @@ window.onload = function () {
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
             width: 650,
-            height: 650*2
+            height: 650 * 2
         },
         physics: {
             default: "arcade",
@@ -15,7 +15,7 @@ window.onload = function () {
                 debug: true
             }
         },
-        scene: [  playGame, Hud]
+        scene: [playGame, Hud]
     }
     game = new Phaser.Game(gameConfig);
     window.focus();
@@ -76,14 +76,13 @@ function shuffle(array) {
     return array;
 }
 
-class Hud extends Phaser.Scene{
-    constructor(){
+class Hud extends Phaser.Scene {
+    constructor() {
         super({ key: 'UIScene', active: true });
 
         this.score = 0;
     }
-    create ()
-    {
+    create() {
         //  Our Text object to display the Score
         let info = this.add.text(10, 10, 'Score: 0', { font: '36px Arial', fill: '#000000' });
 
@@ -118,17 +117,17 @@ function interpolateLinearly(x, values) {
 
     var i = 1;
     while (x_values[i] < x) {
-        i = i+1;
+        i = i + 1;
     }
-    i = i-1;
+    i = i - 1;
 
-    var width = Math.abs(x_values[i] - x_values[i+1]);
+    var width = Math.abs(x_values[i] - x_values[i + 1]);
     var scaling_factor = (x - x_values[i]) / width;
 
     // Get the new color values though interpolation
-    var r = r_values[i] + scaling_factor * (r_values[i+1] - r_values[i])
-    var g = g_values[i] + scaling_factor * (g_values[i+1] - g_values[i])
-    var b = b_values[i] + scaling_factor * (b_values[i+1] - b_values[i])
+    var r = r_values[i] + scaling_factor * (r_values[i + 1] - r_values[i])
+    var g = g_values[i] + scaling_factor * (g_values[i + 1] - g_values[i])
+    var b = b_values[i] + scaling_factor * (b_values[i + 1] - b_values[i])
 
     return [enforceBounds(r), enforceBounds(g), enforceBounds(b)];
 
@@ -136,7 +135,7 @@ function interpolateLinearly(x, values) {
 function enforceBounds(x) {
     if (x < 0) {
         return 0;
-    } else if (x > 1){
+    } else if (x > 1) {
         return 1;
     } else {
         return x;
@@ -156,19 +155,31 @@ class playGame extends Phaser.Scene {
         this.load.plugin('rexpinchplugin', url, true);
     }
 
-    change_color()
-    {
+    change_color() {
         var count = 0
         var color_list = document.getElementById("optList")
-        var ColorMap_to_use = eval(color_list.value)
+        if (color_list.value !== 'Moose') {
+            var ColorMap_to_use = eval(color_list.value)
+        }
+        else { 
+            var ColorMap_to_use = 'Moose'
+         }
+
+
         for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
 
-
-                var color = interpolateLinearly(count/num_x/num_y, ColorMap_to_use);
-                var r = Math.round(255*color[0]);
-                var g = Math.round(255*color[1]);
-                var b = Math.round(255*color[2]);
+                if (ColorMap_to_use === 'Moose') {
+                    var r = ii / num_x * 200 + 55
+                    var g = (ii + jj) / (sq_size * 2)
+                    var b = jj / num_y * 255
+                } else {
+                    var color = interpolateLinearly(count / num_x / num_y, ColorMap_to_use);
+                    var r = Math.round(255 * color[0]);
+                    var g = Math.round(255 * color[1]);
+                    var b = Math.round(255 * color[2]);
+                }
+           
 
                 // var r = ii / num_x * 200 + 55
                 // var g = (ii + jj) / (sq_size * 2)
@@ -212,43 +223,45 @@ class playGame extends Phaser.Scene {
         this.input.dragTimeThreshold = 0.
         this.input.addPointer(4)
 
-        
 
-        var colormaps = ['Blues', 'BuGn', 'BuPu',
-        'GnBu', 'Greens', 'Greys', 'Oranges', 'OrRd',
-        'PuBu', 'PuBuGn', 'PuRd', 'Purples', 'RdPu',
-        'Reds', 'YlGn', 'YlGnBu', 'YlOrBr', 'YlOrRd', 'afmhot', 'autumn', 'bone', 'cool', 'copper',
-        'gist_heat', 'gray', 'hot', 'pink',
-        'spring', 'summer', 'winter', 'BrBG', 'bwr', 'coolwarm', 'PiYG', 'PRGn', 'PuOr',
-        'RdBu', 'RdGy', 'RdYlBu', 'RdYlGn', 'Spectral',
-        'seismic', 'Accent', 'Dark2', 'Paired', 'Pastel1','Pastel2', 'Set1', 'Set2', 'Set3', 'gist_earth', 'terrain', 'ocean', 'gist_stern',
-        'brg', 'CMRmap', 'cubehelix', 'gnuplot', 
-        'gnuplot2', 'gist_ncar', 'nipy_spectral', 
-        'jet', 'rainbow', 'gist_rainbow', 'hsv', 
-        'flag', 'prism']
+
+        var colormaps = ['Moose', 'Blues', 'BuGn', 'BuPu',
+            'GnBu', 'Greens', 'Greys', 'Oranges', 'OrRd',
+            'PuBu', 'PuBuGn', 'PuRd', 'Purples', 'RdPu',
+            'Reds', 'YlGn', 'YlGnBu', 'YlOrBr', 'YlOrRd', 'afmhot', 'autumn', 'bone', 'cool', 'copper',
+            'gist_heat', 'gray', 'hot', 'pink',
+            'spring', 'summer', 'winter', 'BrBG', 'bwr', 'coolwarm', 'PiYG', 'PRGn', 'PuOr',
+            'RdBu', 'RdGy', 'RdYlBu', 'RdYlGn', 'Spectral',
+            'seismic', 'Accent', 'Dark2', 'Paired', 'Pastel1', 'Pastel2', 'Set1', 'Set2', 'Set3', 'gist_earth', 'terrain', 'ocean', 'gist_stern',
+            'brg', 'CMRmap', 'cubehelix', 'gnuplot',
+            'gnuplot2', 'gist_ncar', 'nipy_spectral',
+            'jet', 'rainbow', 'gist_rainbow', 'hsv',
+            'flag', 'prism']
         var color_list = document.getElementById("optList")
         color_list.onchange = this.change_color
-        for (var color_add in colormaps){ 
-        var option = document.createElement("option")
-        option.text = colormaps[color_add]
-        option.value = colormaps[color_add]
-        
-        color_list.add(option,1)}
+        for (var color_add in colormaps) {
+            var option = document.createElement("option")
+            option.text = colormaps[color_add]
+            option.value = colormaps[color_add]
 
-        var ColorMap_to_use = eval(colormaps[1])
+            color_list.add(option, 1)
+        }
+        ColorMap_to_use = 'Moose'
+        if (ColorMap_to_use != 'Moose') { var ColorMap_to_use = eval(colormaps[1]) }
 
         for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
 
-
-                var color = interpolateLinearly(count/num_x/num_y, ColorMap_to_use);
-                var r = Math.round(255*color[0]);
-                var g = Math.round(255*color[1]);
-                var b = Math.round(255*color[2]);
-
-                // var r = ii / num_x * 200 + 55
-                // var g = (ii + jj) / (sq_size * 2)
-                // var b = jj / num_y * 255
+                if (ColorMap_to_use === 'Moose') {
+                    var r = ii / num_x * 200 + 55
+                    var g = (ii + jj) / (sq_size * 2)
+                    var b = jj / num_y * 255
+                } else {
+                    var color = interpolateLinearly(count / num_x / num_y, ColorMap_to_use);
+                    var r = Math.round(255 * color[0]);
+                    var g = Math.round(255 * color[1]);
+                    var b = Math.round(255 * color[2]);
+                }
                 var hex_c = rgbToHex(r, g, b)
                 // // console.log(hex)
                 // var r1 = this.add.rectangle(init_x + ii*sq_size, init_y + jj*sq_size, sq_size, sq_size, 0x6666ff );
@@ -281,7 +294,7 @@ class playGame extends Phaser.Scene {
         this.input.on('pointerdown', this.PointerDown, this)
         // this.input.on('pointer2down', this.pointer2_down, this)
         reload_data = true
-        if (reload_data ) {
+        if (reload_data) {
             var recover_array = JSON.parse(localStorage.getItem('Array'))
             var recover_text_marking_array = JSON.parse(localStorage.getItem('text_array'))
             var array_text_jj = JSON.parse(localStorage.getItem('array_text_jj'))
@@ -399,7 +412,7 @@ class playGame extends Phaser.Scene {
                 //         this.selected = this.rect1
                 //         this.selected.alpha = 0.3
                 //         console.log('rect selected = ' + this.selected)
-                        
+
                 //     }
                 //     else if (this.selected === this.dragObj)
                 //     {
@@ -410,7 +423,7 @@ class playGame extends Phaser.Scene {
                 //         this.selected.x = this.dragObj.x
                 //         this.selected.y = this.dragObj.y
                 //         this.find_and_swap(this.selected)
-                        
+
                 //         this.selected.alpha = 1
                 //         this.selected = null
                 //     }
@@ -487,12 +500,12 @@ class playGame extends Phaser.Scene {
                     // var intersection_data = Phaser.Geom.Intersects.GetRectangleIntersection(rect_in, array_rects[ii][jj]);  
                     // var intersection = Phaser.Geom.Intersects.RectangleToRectangle(array_rects[ii][jj], rect_in);    
                     var distance = Math.sqrt((array_rects[ii][jj].x - array_rects[ii][jj].orig_pos_x) ** 2 + (array_rects[ii][jj].y - array_rects[ii][jj].orig_pos_y) ** 2);
-                    distance = distance/spacer
+                    distance = distance / spacer
                     total_distance += distance;
                     if (array_rects[ii][jj].x == array_rects[ii][jj].orig_pos_x && array_rects[ii][jj].y == array_rects[ii][jj].orig_pos_y) {
                         correct_num++;
                     }
-                    
+
                 }
             }
 
@@ -501,17 +514,17 @@ class playGame extends Phaser.Scene {
         this.events.emit('addScore', str_score);
         // array_rects )
 
-        
+
     }
 
     update(time, delta) {
         this.frameTime += delta
 
-    if (this.frameTime > 16.5) {  
-        this.compute_score_and_save()
-        this.frameTime = 0
+        if (this.frameTime > 16.5) {
+            this.compute_score_and_save()
+            this.frameTime = 0
 
-    }
+        }
     }
 
 
