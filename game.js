@@ -15,7 +15,7 @@ window.onload = function () {
                 debug: true
             }
         },
-        scene: playGame
+        scene: [  playGame, Hud]
     }
     game = new Phaser.Game(gameConfig);
     window.focus();
@@ -76,6 +76,33 @@ function shuffle(array) {
     return array;
 }
 
+class Hud extends Phaser.Scene{
+    constructor(){
+        super({ key: 'UIScene', active: true });
+
+        this.score = 0;
+    }
+    create ()
+    {
+        //  Our Text object to display the Score
+        let info = this.add.text(10, 10, 'Score: 0', { font: '48px Arial', fill: '#000000' });
+
+        //  Grab a reference to the Game Scene
+        let ourGame = this.scene.get('PlayGame');
+
+        //  Listen for events from it
+        ourGame.events.on('addScore', function (str_score) {
+
+            // this.score += 10;
+
+            info.setText('Score: ' + str_score);
+
+        }, this);
+    }
+
+}
+
+
 
 class playGame extends Phaser.Scene {
     constructor() {
@@ -112,7 +139,7 @@ class playGame extends Phaser.Scene {
         var array_ii = Array()
         var array_jj = Array()
         var array_count = Array()
-        this.score_text = this.add.text(10, num_y * spacer + init_y, 'test', { color: rgbToHex(0, 0, 0) })
+
         var count = 0
 
         this.input.dragTimeThreshold = 0.
@@ -360,7 +387,8 @@ class playGame extends Phaser.Scene {
                 }
             }
 
-        this.score_text.text = correct_num + '/' + num_y * num_y
+        var str_score = correct_num + '/' + num_y * num_y
+        this.events.emit('addScore', str_score )
         // array_rects )
         var string_data = JSON.stringify(array_rects)
         localStorage.setItem('Array', string_data)
