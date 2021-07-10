@@ -7,7 +7,7 @@ window.onload = function () {
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
             width: 650,
-            height: 650
+            height: 650*2
         },
         physics: {
             default: "arcade",
@@ -25,7 +25,7 @@ var init_x = 20
 var init_y = 20
 spacer = 20
 num_x = 30
-num_y = 30
+num_y = 60
 var reload_data = true
 var array_rects
 var array_groups
@@ -118,7 +118,7 @@ class playGame extends Phaser.Scene {
         this.input.dragTimeThreshold = 0.
         this.input.addPointer(4)
         for (var ii = 0; ii < num_x; ii++) {
-            for (var jj = 0; jj < num_x; jj++) {
+            for (var jj = 0; jj < num_y; jj++) {
 
                 var r = ii / num_x * 200 + 55
                 var g = (ii + jj) / (sq_size * 2)
@@ -155,13 +155,13 @@ class playGame extends Phaser.Scene {
         this.input.on('pointerdown', this.PointerDown, this)
         // this.input.on('pointer2down', this.pointer2_down, this)
         reload_data = true
-        if (reload_data) {
+        if (reload_data ) {
             var recover_array = JSON.parse(localStorage.getItem('Array'))
             var recover_text_marking_array = JSON.parse(localStorage.getItem('text_array'))
             var array_text_jj = JSON.parse(localStorage.getItem('array_text_jj'))
             var array_text_ii = JSON.parse(localStorage.getItem('array_text_ii'))
             for (var ii = 0; ii < num_x; ii++) {
-                for (var jj = 0; jj < num_x; jj++) {
+                for (var jj = 0; jj < num_y; jj++) {
                     array_rects[ii][jj].x = recover_array[ii][jj].x
                     array_rects[ii][jj].y = recover_array[ii][jj].y
                     array_rects[ii][jj].last_pos_x = array_rects[ii][jj].x
@@ -307,7 +307,7 @@ class playGame extends Phaser.Scene {
         var sub_found = false
 
         for (var ii = 0; ii < num_x; ii++)
-            for (var jj = 0; jj < num_x; jj++) {
+            for (var jj = 0; jj < num_y; jj++) {
                 {
                     if (array_rects[ii][jj] != rect_in & equals(array_rects[ii][jj].x, new_x) & equals(array_rects[ii][jj].y, new_y)) {
                         var intersected_array = array_rects[ii][jj]
@@ -345,7 +345,7 @@ class playGame extends Phaser.Scene {
 
         var correct_num = 0
         for (var ii = 0; ii < num_x; ii++)
-            for (var jj = 0; jj < num_x; jj++) {
+            for (var jj = 0; jj < num_y; jj++) {
                 {
                     // var intersection_data = Phaser.Geom.Intersects.GetRectangleIntersection(rect_in, array_rects[ii][jj]);  
                     // var intersection = Phaser.Geom.Intersects.RectangleToRectangle(array_rects[ii][jj], rect_in);    
