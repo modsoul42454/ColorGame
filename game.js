@@ -166,8 +166,8 @@ class playGame extends Phaser.Scene {
          }
 
 
+         for (var jj = 0; jj < num_y; jj++) {
         for (var ii = 0; ii < num_x; ii++) {
-            for (var jj = 0; jj < num_y; jj++) {
 
                 if (ColorMap_to_use === 'Moose') {
                     var r = ii / num_x * 200 + 55
