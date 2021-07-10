@@ -85,7 +85,7 @@ class Hud extends Phaser.Scene{
     create ()
     {
         //  Our Text object to display the Score
-        let info = this.add.text(10, 10, 'Score: 0', { font: '48px Arial', fill: '#000000' });
+        let info = this.add.text(10, 10, 'Score: 0', { font: '36px Arial', fill: '#000000' });
 
         //  Grab a reference to the Game Scene
         let ourGame = this.scene.get('PlayGame');
@@ -102,7 +102,46 @@ class Hud extends Phaser.Scene{
 
 }
 
+function interpolateLinearly(x, values) {
 
+    // Split values into four lists
+    var x_values = [];
+    var r_values = [];
+    var g_values = [];
+    var b_values = [];
+    for (i in values) {
+        x_values.push(values[i][0]);
+        r_values.push(values[i][1][0]);
+        g_values.push(values[i][1][1]);
+        b_values.push(values[i][1][2]);
+    }
+
+    var i = 1;
+    while (x_values[i] < x) {
+        i = i+1;
+    }
+    i = i-1;
+
+    var width = Math.abs(x_values[i] - x_values[i+1]);
+    var scaling_factor = (x - x_values[i]) / width;
+
+    // Get the new color values though interpolation
+    var r = r_values[i] + scaling_factor * (r_values[i+1] - r_values[i])
+    var g = g_values[i] + scaling_factor * (g_values[i+1] - g_values[i])
+    var b = b_values[i] + scaling_factor * (b_values[i+1] - b_values[i])
+
+    return [enforceBounds(r), enforceBounds(g), enforceBounds(b)];
+
+}
+function enforceBounds(x) {
+    if (x < 0) {
+        return 0;
+    } else if (x > 1){
+        return 1;
+    } else {
+        return x;
+    }
+}
 
 class playGame extends Phaser.Scene {
     constructor() {
@@ -144,12 +183,20 @@ class playGame extends Phaser.Scene {
 
         this.input.dragTimeThreshold = 0.
         this.input.addPointer(4)
+
+        var ColorMap_to_use = afmhot 
         for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
 
-                var r = ii / num_x * 200 + 55
-                var g = (ii + jj) / (sq_size * 2)
-                var b = jj / num_y * 255
+
+                var color = interpolateLinearly(count/num_x/num_y, ColorMap_to_use);
+                var r = Math.round(255*color[0]);
+                var g = Math.round(255*color[1]);
+                var b = Math.round(255*color[2]);
+
+                // var r = ii / num_x * 200 + 55
+                // var g = (ii + jj) / (sq_size * 2)
+                // var b = jj / num_y * 255
                 var hex_c = rgbToHex(r, g, b)
                 // // console.log(hex)
                 // var r1 = this.add.rectangle(init_x + ii*sq_size, init_y + jj*sq_size, sq_size, sq_size, 0x6666ff );
@@ -369,35 +416,43 @@ class playGame extends Phaser.Scene {
             rect_in.last_pos_y = rect_in.y
 
         }
+        var ii;
+        var jj;
+        var intersected_array;
+        this.compute_score_and_save();
 
-        var correct_num = 0
+        // recover_array = JSON.parse(string_data)
+    }
+
+    compute_score_and_save() {
+        var total_distance = 0.0;
+        var correct_num = 0;
         for (var ii = 0; ii < num_x; ii++)
             for (var jj = 0; jj < num_y; jj++) {
                 {
                     // var intersection_data = Phaser.Geom.Intersects.GetRectangleIntersection(rect_in, array_rects[ii][jj]);  
                     // var intersection = Phaser.Geom.Intersects.RectangleToRectangle(array_rects[ii][jj], rect_in);    
-
+                    var distance = Math.sqrt((array_rects[ii][jj].x - array_rects[ii][jj].orig_pos_x) ** 2 + (array_rects[ii][jj].y - array_rects[ii][jj].orig_pos_y) ** 2);
+                    distance = distance/spacer
+                    total_distance += distance;
                     if (array_rects[ii][jj].x == array_rects[ii][jj].orig_pos_x && array_rects[ii][jj].y == array_rects[ii][jj].orig_pos_y) {
-                        correct_num++
+                        correct_num++;
                     }
-                    if (array_rects[ii][jj] != rect_in & equals(array_rects[ii][jj].x, new_x) & equals(array_rects[ii][jj].y, new_y)) {
-                        var intersected_array = array_rects[ii][jj]
-                        sub_found = true
-                    }
+                    
                 }
             }
 
-        var str_score = correct_num + '/' + num_y * num_y
-        this.events.emit('addScore', str_score )
-        // array_rects )
-        var string_data = JSON.stringify(array_rects)
-        localStorage.setItem('Array', string_data)
+        var str_score = correct_num + '/' + num_y * num_y + ', ' + total_distance.toFixed(2);
 
-        // recover_array = JSON.parse(string_data)
+        this.events.emit('addScore', str_score);
+        // array_rects )
+        var string_data = JSON.stringify(array_rects);
+        localStorage.setItem('Array', string_data);
+        
     }
 
     update() {
-
+        this.compute_score_and_save()
     }
 
 
