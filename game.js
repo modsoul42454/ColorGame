@@ -143,6 +143,8 @@ function enforceBounds(x) {
     }
 }
 
+
+
 class playGame extends Phaser.Scene {
     constructor() {
         super("PlayGame");
@@ -154,6 +156,31 @@ class playGame extends Phaser.Scene {
         this.load.plugin('rexpinchplugin', url, true);
     }
 
+    change_color()
+    {
+        var count = 0
+        var color_list = document.getElementById("optList")
+        var ColorMap_to_use = eval(color_list.value)
+        for (var ii = 0; ii < num_x; ii++) {
+            for (var jj = 0; jj < num_y; jj++) {
+
+
+                var color = interpolateLinearly(count/num_x/num_y, ColorMap_to_use);
+                var r = Math.round(255*color[0]);
+                var g = Math.round(255*color[1]);
+                var b = Math.round(255*color[2]);
+
+                // var r = ii / num_x * 200 + 55
+                // var g = (ii + jj) / (sq_size * 2)
+                // var b = jj / num_y * 255
+                var hex_c = rgbToHex(r, g, b)
+                var rect1 = array_rects[ii][jj]
+                rect1.fillColor = hex_c
+                count++
+            }
+        }
+
+    }
     create() {
         this.dragScale = this.plugins.get('rexpinchplugin').add(this);
         var camera = this.cameras.main;
@@ -184,7 +211,31 @@ class playGame extends Phaser.Scene {
         this.input.dragTimeThreshold = 0.
         this.input.addPointer(4)
 
-        var ColorMap_to_use = afmhot 
+        
+
+        var colormaps = ['Blues', 'BuGn', 'BuPu',
+        'GnBu', 'Greens', 'Greys', 'Oranges', 'OrRd',
+        'PuBu', 'PuBuGn', 'PuRd', 'Purples', 'RdPu',
+        'Reds', 'YlGn', 'YlGnBu', 'YlOrBr', 'YlOrRd', 'afmhot', 'autumn', 'bone', 'cool', 'copper',
+        'gist_heat', 'gray', 'hot', 'pink',
+        'spring', 'summer', 'winter', 'BrBG', 'bwr', 'coolwarm', 'PiYG', 'PRGn', 'PuOr',
+        'RdBu', 'RdGy', 'RdYlBu', 'RdYlGn', 'Spectral',
+        'seismic', 'Accent', 'Dark2', 'Paired', 'Pastel1','Pastel2', 'Set1', 'Set2', 'Set3', 'gist_earth', 'terrain', 'ocean', 'gist_stern',
+        'brg', 'CMRmap', 'cubehelix', 'gnuplot', 
+        'gnuplot2', 'gist_ncar', 'nipy_spectral', 
+        'jet', 'rainbow', 'gist_rainbow', 'hsv', 
+        'flag', 'prism']
+        var color_list = document.getElementById("optList")
+        color_list.onchange = this.change_color
+        for (var color_add in colormaps){ 
+        var option = document.createElement("option")
+        option.text = colormaps[color_add]
+        option.value = colormaps[color_add]
+        
+        color_list.add(option,1)}
+
+        var ColorMap_to_use = eval(colormaps[1])
+
         for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
 
