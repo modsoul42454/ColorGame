@@ -29,7 +29,7 @@ num_y = 60
 var reload_data = true
 var array_rects
 var array_groups
-
+var distance_old =0 
 function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -84,17 +84,25 @@ class Hud extends Phaser.Scene {
     }
     create() {
         //  Our Text object to display the Score
-        let info = this.add.text(10, 10, 'Score: 0', { font: '36px Arial', fill: '#000000' });
-
+        let info = this.add.text(10, 10, 'Score: 0', { font: '36px Arial' });
+        info.setFill('black')
+        info.setBackgroundColor('White')
         //  Grab a reference to the Game Scene
         let ourGame = this.scene.get('PlayGame');
 
         //  Listen for events from it
-        ourGame.events.on('addScore', function (str_score) {
+        ourGame.events.on('addScore', function ({str_score,direction}) {
 
             // this.score += 10;
 
             info.setText('Score: ' + str_score);
+
+            if (direction>0){
+                info.setFill('Red')
+            }else
+            {
+                info.setFill('blue')
+            }
 
         }, this);
     }
@@ -142,6 +150,25 @@ function enforceBounds(x) {
     }
 }
 
+const count_offset_color_map = Math.round( Math.random() *num_x*num_y )
+function SetColorMapOfGrid(ColorMap_to_use, ii, jj, count) {
+
+    count += count_offset_color_map*0
+
+    count = count%(num_x*num_y)
+    if (ColorMap_to_use === 'Moose') {
+        var r = ii / num_x * 200 + 55;
+        var g = (ii + jj) / (sq_size * 2);
+        var b = jj / num_y * 255;
+    } else {
+        var color = interpolateLinearly(count / num_x / num_y, ColorMap_to_use);
+        var r = Math.round(255 * color[0]);
+        var g = Math.round(255 * color[1]);
+        var b = Math.round(255 * color[2]);
+    }
+    var hex_c = rgbToHex(r, g, b);
+    return hex_c
+}
 
 
 class playGame extends Phaser.Scene {
@@ -169,29 +196,16 @@ class playGame extends Phaser.Scene {
          for (var jj = 0; jj < num_y; jj++) {
         for (var ii = 0; ii < num_x; ii++) {
 
-                if (ColorMap_to_use === 'Moose') {
-                    var r = ii / num_x * 200 + 55
-                    var g = (ii + jj) / (sq_size * 2)
-                    var b = jj / num_y * 255
-                } else {
-                    var color = interpolateLinearly(count / num_x / num_y, ColorMap_to_use);
-                    var r = Math.round(255 * color[0]);
-                    var g = Math.round(255 * color[1]);
-                    var b = Math.round(255 * color[2]);
-                }
-           
-
-                // var r = ii / num_x * 200 + 55
-                // var g = (ii + jj) / (sq_size * 2)
-                // var b = jj / num_y * 255
-                var hex_c = rgbToHex(r, g, b)
-                var rect1 = array_rects[ii][jj]
+                var hex_c = SetColorMapOfGrid(ColorMap_to_use, ii, jj, count);
+                var rect1 = array_rects[ii][jj];
                 rect1.fillColor = hex_c
                 count++
             }
         }
 
     }
+
+
     create() {
         this.dragScale = this.plugins.get('rexpinchplugin').add(this);
         var camera = this.cameras.main;
@@ -252,20 +266,11 @@ class playGame extends Phaser.Scene {
         for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
 
-                if (ColorMap_to_use === 'Moose') {
-                    var r = ii / num_x * 200 + 55
-                    var g = (ii + jj) / (sq_size * 2)
-                    var b = jj / num_y * 255
-                } else {
-                    var color = interpolateLinearly(count / num_x / num_y, ColorMap_to_use);
-                    var r = Math.round(255 * color[0]);
-                    var g = Math.round(255 * color[1]);
-                    var b = Math.round(255 * color[2]);
-                }
-                var hex_c = rgbToHex(r, g, b)
+                var hex_c = SetColorMapOfGrid(ColorMap_to_use, ii, jj, count);
                 // // console.log(hex)
                 // var r1 = this.add.rectangle(init_x + ii*sq_size, init_y + jj*sq_size, sq_size, sq_size, 0x6666ff );
                 var rect1 = this.add.rectangle(init_x + ii * (spacer), init_y + jj * spacer, sq_size, sq_size, hex_c);
+                rect1.fillColor = hex_c;
                 // var group = this.add.container()
                 // group.add(rect1)
                 // array_groups[ii][jj] = group
@@ -494,6 +499,7 @@ class playGame extends Phaser.Scene {
     compute_score_and_save() {
         var total_distance = 0.0;
         var correct_num = 0;
+
         for (var ii = 0; ii < num_x; ii++)
             for (var jj = 0; jj < num_y; jj++) {
                 {
@@ -510,8 +516,9 @@ class playGame extends Phaser.Scene {
             }
 
         var str_score = correct_num + '/' + num_y * num_y + ', ' + total_distance.toFixed(2);
-
-        this.events.emit('addScore', str_score);
+        var direction = -distance_old + total_distance
+        distance_old = total_distance
+        this.events.emit('addScore', {str_score,direction});
         // array_rects )
 
 
@@ -520,7 +527,7 @@ class playGame extends Phaser.Scene {
     update(time, delta) {
         this.frameTime += delta
 
-        if (this.frameTime > 16.5) {
+        if (this.frameTime > 100) {
             this.compute_score_and_save()
             this.frameTime = 0
 
