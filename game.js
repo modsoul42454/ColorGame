@@ -30,7 +30,8 @@ spacer = 20
 num_x = 30
 num_y = 60
 const reload_data = true
-const difficulty_ratio = 0.98
+const difficulty_ratio = 0.8
+const difficulty_dist = 10
 var array_rects
 var array_groups
 var distance_old = 0
@@ -214,7 +215,16 @@ class playGame extends Phaser.Scene {
         game.scene.scenes[0].slider_offset_val = parseInt(slider_offset.value)
 
     }
-
+    getConfirmation() {
+        var retVal = confirm("Do you want to randomize the grid ?");
+        if( retVal == true ) {
+            RandomizeGrid()
+           return true;
+        } else {
+           document.write ("User does not want to continue!");
+           return false;
+        }
+     }
     create() {
         this.dragScale = this.plugins.get('rexpinchplugin').add(this);
         var camera = this.cameras.main;
@@ -250,6 +260,10 @@ class playGame extends Phaser.Scene {
         var slider_offset = document.getElementById("myOffsetVal")
         slider_offset.onchange = this.offset_sliderChange
         this.slider_offset_val = slider_offset.value
+
+
+        var ResetButton = document.getElementById("ResetButton")
+        ResetButton.onclick = this.getConfirmation
         // 
 
         var colormaps = ['Moose', 'Blues', 'BuGn', 'BuPu',
@@ -342,53 +356,63 @@ class playGame extends Phaser.Scene {
 
         }
 
-        if (!reload_data) {
-            var count = 0
-            this.array_text = []
-            var array_text_ii = []
-            var array_text_jj = []
-            for (var ii = 0; ii < num_x; ii++)
-                for (var jj = 0; jj < num_y; jj++) {
-                    {
-                        array_rects[ii][jj].flag_interactive = true
-                        //  |
-                        if (Math.random() < difficulty_ratio) {
-                            // console.log( ii + ',' + jj)
-                            array_rects[ii][jj].x = init_x + Math.random() * num_x * (spacer)
-                            array_rects[ii][jj].y = init_y + Math.random() * num_y * (spacer)
-                            this.find_and_swap(array_rects[ii][jj],false);
-                            array_rects[ii][jj].last_pos_x = array_rects[ii][jj].x
-                            array_rects[ii][jj].last_pos_y = array_rects[ii][jj].y
-                            // array_rects[ii][jj].visible = false
-                            array_rects[ii][jj].flag_interactive = true
-                            array_rects[ii][jj].setInteractive();
-                            // array_rects[ii][jj].color = rgbToHex(0,0,0)
-                            // this.add.text(array_rects[ii][jj].x , array_rects[ii][jj].y  ,
-                            //      'o', { color: rgbToHex(0,0,0) }).setOrigin(0, 0);
-
-                        }
-                        else {
-
-                            var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'o', { color: rgbToHex(0, 0, 0) })
-                            text.depth = 1000
-                            array_text_ii.push(ii)
-                            array_text_jj.push(jj)
-                            array_rects[ii][jj].disableInteractive();
-                            array_rects[ii][jj].flag_interactive = false
-                            this.array_text.push(text)
-                        }
-                    }
-                }
-            // console.log(count)
-            var string_data = JSON.stringify(this.array_text)
-            localStorage.setItem('text_array', string_data)
-            localStorage.setItem('array_text_ii', JSON.stringify(array_text_ii))
-            localStorage.setItem('array_text_jj', JSON.stringify(array_text_jj))
-        }
+        // var count;
+        // var ii;
+        // var jj;
+        // var array_text_jj;
+        // var array_text_ii;
+        // var text;
+        // ({ count, ii, jj, array_text_jj, array_text_ii, text, ii, jj } = this.newMethod(count, array_text_ii, array_text_jj, ii, jj, text));
 
 
     }
 
+
+    RandomizeGrid() {
+        if (!reload_data) {
+            var count = 0;
+            this.array_text = [];
+            var array_text_ii = [];
+            var array_text_jj = [];
+            for (var ii = 0; ii < num_x; ii++)
+                for (var jj = 0; jj < num_y; jj++) {
+                    {
+                        array_rects[ii][jj].flag_interactive = true;
+                        //  |
+                        if (Math.random() < difficulty_ratio) {
+                            // console.log( ii + ',' + jj)
+                            array_rects[ii][jj].x = init_x + Math.random() * num_x * (spacer);
+                            array_rects[ii][jj].y = init_y + Math.random() * num_y * (spacer);
+                            this.find_and_swap(array_rects[ii][jj], false);
+                            array_rects[ii][jj].last_pos_x = array_rects[ii][jj].x;
+                            array_rects[ii][jj].last_pos_y = array_rects[ii][jj].y;
+                            // array_rects[ii][jj].visible = false
+                            array_rects[ii][jj].flag_interactive = true;
+                            array_rects[ii][jj].setInteractive();
+                            // array_rects[ii][jj].color = rgbToHex(0,0,0)
+                            // this.add.text(array_rects[ii][jj].x , array_rects[ii][jj].y  ,
+                            //      'o', { color: rgbToHex(0,0,0) }).setOrigin(0, 0);
+                        }
+                        else {
+
+                            var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'o', { color: rgbToHex(0, 0, 0) });
+                            text.depth = 1000;
+                            array_text_ii.push(ii);
+                            array_text_jj.push(jj);
+                            array_rects[ii][jj].disableInteractive();
+                            array_rects[ii][jj].flag_interactive = false;
+                            this.array_text.push(text);
+                        }
+                    }
+                }
+            // console.log(count)
+            var string_data = JSON.stringify(this.array_text);
+            localStorage.setItem('text_array', string_data);
+            localStorage.setItem('array_text_ii', JSON.stringify(array_text_ii));
+            localStorage.setItem('array_text_jj', JSON.stringify(array_text_jj));
+        }
+        
+    }
 
     pointer2_down() {
         // console.log('Pointer 2 down')
