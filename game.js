@@ -35,6 +35,7 @@ const difficulty_dist = 10
 var array_rects
 var array_groups
 var distance_old = 0
+var playGame_class_var 
 function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -217,8 +218,9 @@ class playGame extends Phaser.Scene {
     }
     getConfirmation() {
         var retVal = confirm("Do you want to randomize the grid ?");
+        playGame_class_var
         if( retVal == true ) {
-            RandomizeGrid()
+            playGame_class_var.RandomizeGrid()
            return true;
         } else {
            document.write ("User does not want to continue!");
@@ -226,6 +228,7 @@ class playGame extends Phaser.Scene {
         }
      }
     create() {
+        playGame_class_var =this 
         this.dragScale = this.plugins.get('rexpinchplugin').add(this);
         var camera = this.cameras.main;
         this.pinch_zoom_flag = false
@@ -369,7 +372,7 @@ class playGame extends Phaser.Scene {
 
 
     RandomizeGrid() {
-        if (!reload_data) {
+        if (true) {
             var count = 0;
             this.array_text = [];
             var array_text_ii = [];
