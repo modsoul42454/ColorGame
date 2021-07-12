@@ -29,7 +29,7 @@ var init_y = 20
 spacer = 20
 num_x = 30
 num_y = 60
-const reload_data = true
+var reload_data = true
 const difficulty_ratio = 0.98
 var array_rects
 var array_groups
@@ -311,7 +311,10 @@ class playGame extends Phaser.Scene {
 
         this.input.on('pointerdown', this.PointerDown, this)
         // this.input.on('pointer2down', this.pointer2_down, this)
-        
+        var recover_array = JSON.parse(localStorage.getItem('Array'))
+        if (recover_array == null){
+        reload_data = false
+        }
         if (reload_data) {
             var recover_array = JSON.parse(localStorage.getItem('Array'))
             var recover_text_marking_array = JSON.parse(localStorage.getItem('text_array'))
