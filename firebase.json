@@ -4,6 +4,7 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
+    "site" : "colorsorter",
     "public": "public",
     "ignore": [
       "firebase.json",
