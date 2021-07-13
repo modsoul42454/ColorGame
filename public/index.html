@@ -20,8 +20,28 @@
             /* Cursor on hover */
         }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.js"></script>
-    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css" />
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyBFBGq0E6rygcGDysGx6PvM3pKpB3Sp6oI",
+    authDomain: "colorgame-3c359.firebaseapp.com",
+    databaseURL: "https://colorgame-3c359-default-rtdb.firebaseio.com",
+    projectId: "colorgame-3c359",
+    storageBucket: "colorgame-3c359.appspot.com",
+    messagingSenderId: "394017745851",
+    appId: "1:394017745851:web:23bb8f730bfff5baa3729e"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+
     <script src="dist/phaser.js"></script>
     <script src="js-colormaps/js-colormaps.js"></script>
 
@@ -36,13 +56,7 @@
     <div id="thegame"></div>
 
 
-    <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
-    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-    <script src="/__/firebase/8.7.1/firebase-app.js"></script>
 
-    <!-- Add Firebase products that you want to use -->
-    <script src="/__/firebase/8.7.1/firebase-auth.js"></script>
-    <script src="/__/firebase/8.7.1/firebase-firestore.js"></script>
 </body>
 
 </html>
