@@ -199,26 +199,28 @@ class playGame extends Phaser.Scene {
         var color_list = document.getElementById("optList")
         if (color_list.value !== 'Moose') {
             var colormap_name = color_list.value
-            var ColorMap_to_use = eval(colormap_name.replace('_y','').replace('_x',''))
+            var ColorMap_to_use = eval(colormap_name.replace('_y', '').replace('_x', ''))
         }
         else {
             var ColorMap_to_use = 'Moose'
+            colormap_name       = 'Moose'
         }
 
-        if ( colormap_name.includes('_y') ){
-        for (var jj = 0; jj < num_y; jj++) {
-            for (var ii = 0; ii < num_x; ii++) {
+        if (colormap_name.includes('_y') || ColorMap_to_use == 'Moose' ) {
+            for (var jj = 0; jj < num_y; jj++) {
+                for (var ii = 0; ii < num_x; ii++) {
 
-                var hex_c = SetColorMapOfGrid(ColorMap_to_use, ii, jj, count);
-                var rect1 = array_rects[ii][jj];
-                rect1.fillColor = hex_c
-                count++
+                    var hex_c = SetColorMapOfGrid(ColorMap_to_use, ii, jj, count);
+                    var rect1 = array_rects[ii][jj];
+                    rect1.fillColor = hex_c
+                    count++
+                }
             }
-        }}
-        else if (colormap_name.includes('_x')){
+        }
+        else if (colormap_name.includes('_x')) {
             for (var ii = 0; ii < num_x; ii++) {
-                    for (var jj = 0; jj < num_y; jj++) {
-    
+                for (var jj = 0; jj < num_y; jj++) {
+
                     var hex_c = SetColorMapOfGrid(ColorMap_to_use, ii, jj, count);
                     var rect1 = array_rects[ii][jj];
                     rect1.fillColor = hex_c
@@ -304,20 +306,24 @@ class playGame extends Phaser.Scene {
         var color_list = document.getElementById("optList")
         color_list.onchange = this.change_color
         for (var color_add in colormaps) {
-            var option = document.createElement("option")
-            option.text = colormaps[color_add] + '_y'
-            option.value = colormaps[color_add] + '_y'
+            
 
-            color_list.add(option, 1)
+            for (var direction in ['_x', '_y']) {
+                var option = document.createElement("option")
+                option.text = colormaps[color_add] + ['_x', '_y'][direction]
+                option.value = colormaps[color_add] + ['_x', '_y'][direction]
+                color_list.add(option, 1)
+            }
+            
         }
 
-        for (var color_add in colormaps) {
-            var option = document.createElement("option")
-            option.text = colormaps[color_add] + '_x'
-            option.value = colormaps[color_add] + '_x'
+        // for (var color_add in colormaps) {
+        //     var option = document.createElement("option")
+        //     option.text = colormaps[color_add] + '_x'
+        //     option.value = colormaps[color_add] + '_x'
 
-            color_list.add(option, 1)
-        }
+        //     color_list.add(option, 1)
+        // }
 
         var option = document.createElement("option")
         option.text = 'Moose'
@@ -588,18 +594,18 @@ class playGame extends Phaser.Scene {
                         sub_found = true
 
 
-                        //
-                        for (var ii1 = 0; ii1 < num_x; ii1++) {
-                            for (var jj1 = 0; jj1 < num_y; jj1++)
-                                
-                            if (Math.abs(array_rects[ii][jj].x - array_rects[ii1][jj1].x)<0.1 && Math.abs(array_rects[ii][jj].y - array_rects[ii1][jj1].y)<0.1) {
-                                console.log(array_rects[ii][jj])
-                                // array_rects[ii1][jj1].x = init_x + (num_x + 10 + 10*Math.random())*spacer
-                            }
-                        }
+                        // //
+                        // for (var ii1 = 0; ii1 < num_x; ii1++) {
+                        //     for (var jj1 = 0; jj1 < num_y; jj1++)
+
+                        //         if (Math.abs(array_rects[ii][jj].x - array_rects[ii1][jj1].x) < 0.1 && Math.abs(array_rects[ii][jj].y - array_rects[ii1][jj1].y) < 0.1) {
+                        //             console.log(array_rects[ii][jj])
+                        //             // array_rects[ii1][jj1].x = init_x + (num_x + 10 + 10*Math.random())*spacer
+                        //         }
+                        // }
 
 
-                        //  
+                        // //  
 
 
 
