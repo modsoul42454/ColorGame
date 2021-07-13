@@ -8,7 +8,7 @@
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8000/Game1.html",
+            "url": "http://localhost:8000/public/index.html",
             "webRoot": "${workspaceFolder}"
         }
     ]
