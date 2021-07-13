@@ -198,13 +198,14 @@ class playGame extends Phaser.Scene {
         var count = 0
         var color_list = document.getElementById("optList")
         if (color_list.value !== 'Moose') {
-            var ColorMap_to_use = eval(color_list.value)
+            var colormap_name = color_list.value
+            var ColorMap_to_use = eval(colormap_name.replace('_y','').replace('_x',''))
         }
         else {
             var ColorMap_to_use = 'Moose'
         }
 
-
+        if ( colormap_name.includes('_y') ){
         for (var jj = 0; jj < num_y; jj++) {
             for (var ii = 0; ii < num_x; ii++) {
 
@@ -213,6 +214,19 @@ class playGame extends Phaser.Scene {
                 rect1.fillColor = hex_c
                 count++
             }
+        }}
+        else if (colormap_name.includes('_x')){
+            for (var ii = 0; ii < num_x; ii++) {
+                    for (var jj = 0; jj < num_y; jj++) {
+    
+                    var hex_c = SetColorMapOfGrid(ColorMap_to_use, ii, jj, count);
+                    var rect1 = array_rects[ii][jj];
+                    rect1.fillColor = hex_c
+                    count++
+                }
+            }
+
+
         }
 
 
@@ -275,7 +289,7 @@ class playGame extends Phaser.Scene {
         ResetButton.onclick = this.getConfirmation
         // 
 
-        var colormaps = ['Moose', 'Blues', 'BuGn', 'BuPu',
+        var colormaps = ['Blues', 'BuGn', 'BuPu',
             'GnBu', 'Greens', 'Greys', 'Oranges', 'OrRd',
             'PuBu', 'PuBuGn', 'PuRd', 'Purples', 'RdPu',
             'Reds', 'YlGn', 'YlGnBu', 'YlOrBr', 'YlOrRd', 'afmhot', 'autumn', 'bone', 'cool', 'copper',
@@ -291,11 +305,26 @@ class playGame extends Phaser.Scene {
         color_list.onchange = this.change_color
         for (var color_add in colormaps) {
             var option = document.createElement("option")
-            option.text = colormaps[color_add]
-            option.value = colormaps[color_add]
+            option.text = colormaps[color_add] + '_y'
+            option.value = colormaps[color_add] + '_y'
 
             color_list.add(option, 1)
         }
+
+        for (var color_add in colormaps) {
+            var option = document.createElement("option")
+            option.text = colormaps[color_add] + '_x'
+            option.value = colormaps[color_add] + '_x'
+
+            color_list.add(option, 1)
+        }
+
+        var option = document.createElement("option")
+        option.text = 'Moose'
+        option.value = 'Moose'
+
+        color_list.add(option, 1)
+
         this.ColorMap_to_use = 'Moose'
         if (this.ColorMap_to_use != 'Moose') {
             this.ColorMap_to_use = eval(colormaps[1])
@@ -549,13 +578,31 @@ class playGame extends Phaser.Scene {
         var new_y = Math.round(rect_in.y / spacer) * spacer
         var sub_found = false
 
+
+
         for (var ii = 0; ii < num_x; ii++)
             for (var jj = 0; jj < num_y; jj++) {
                 {
                     if (array_rects[ii][jj] != rect_in & equals(array_rects[ii][jj].x, new_x) & equals(array_rects[ii][jj].y, new_y)) {
                         var intersected_array = array_rects[ii][jj]
                         sub_found = true
-                        break
+
+
+                        //
+                        for (var ii1 = 0; ii1 < num_x; ii1++) {
+                            for (var jj1 = 0; jj1 < num_y; jj1++)
+                                
+                            if (Math.abs(array_rects[ii][jj].x - array_rects[ii1][jj1].x)<0.1 && Math.abs(array_rects[ii][jj].y - array_rects[ii1][jj1].y)<0.1) {
+                                console.log(array_rects[ii][jj])
+                                // array_rects[ii1][jj1].x = init_x + (num_x + 10 + 10*Math.random())*spacer
+                            }
+                        }
+
+
+                        //  
+
+
+
                     }
                 }
             }
@@ -583,8 +630,14 @@ class playGame extends Phaser.Scene {
             // recover_array = JSON.parse(string_data)
         }
         else {
-            rect_in.x = rect_in.last_pos_x
-            rect_in.y = rect_in.last_pos_y
+            // rect_in.x = rect_in.last_pos_x
+            // rect_in.y = rect_in.last_pos_y
+
+            // rect_in.last_pos_x = rect_in.x
+            // rect_in.last_pos_y = rect_in.y
+
+            rect_in.x = Math.round(rect_in.x / spacer) * spacer
+            rect_in.y = Math.round(rect_in.y / spacer) * spacer
 
             rect_in.last_pos_x = rect_in.x
             rect_in.last_pos_y = rect_in.y
@@ -647,17 +700,17 @@ class playGame extends Phaser.Scene {
         }
 
         if (this.game.scale.isPortrait) {
-            this.game.scale.setGameSize(1080/1.5, 1920/1.5)
+            this.game.scale.setGameSize(1080 / 1.5, 1920 / 1.5)
             rect_container.rotation = Math.PI * 2
             rect_container.x = 0
         } else if (this.game.scale.isLandscape) {
 
 
-            this.game.scale.setGameSize(1920/1.5, 1080/1.5)
+            this.game.scale.setGameSize(1920 / 1.5, 1080 / 1.5)
             rect_container.rotation = Math.PI / 2
-            rect_container.x = (init_x + num_x*spacer  )*2  
+            rect_container.x = (init_x + num_x * spacer) * 2
         }
-       
+
     }
 
 
