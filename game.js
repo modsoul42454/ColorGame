@@ -47,7 +47,19 @@ function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
 }
-
+const findDuplicates = (arr) => {
+    let sorted_arr = arr.slice().sort(); // You can define the comparing function here. 
+    // JS by default uses a crappy string compare.
+    // (we use slice to clone the array so the
+    // original array won't be modified)
+    let results = [];
+    for (let i = 0; i < sorted_arr.length - 1; i++) {
+      if (sorted_arr[i + 1] == sorted_arr[i]) {
+        results.push(sorted_arr[i]);
+      }
+    }
+    return results;
+  }
 function rgbToHex(r, g, b) {
     r = Math.round(r)
     g = Math.round(g)
@@ -203,10 +215,10 @@ class playGame extends Phaser.Scene {
         }
         else {
             var ColorMap_to_use = 'Moose'
-            colormap_name       = 'Moose'
+            colormap_name = 'Moose'
         }
 
-        if (colormap_name.includes('_y') || ColorMap_to_use == 'Moose' ) {
+        if (colormap_name.includes('_y') || ColorMap_to_use == 'Moose') {
             for (var jj = 0; jj < num_y; jj++) {
                 for (var ii = 0; ii < num_x; ii++) {
 
@@ -306,7 +318,7 @@ class playGame extends Phaser.Scene {
         var color_list = document.getElementById("optList")
         color_list.onchange = this.change_color
         for (var color_add in colormaps) {
-            
+
 
             for (var direction in ['_x', '_y']) {
                 var option = document.createElement("option")
@@ -314,7 +326,7 @@ class playGame extends Phaser.Scene {
                 option.value = colormaps[color_add] + ['_x', '_y'][direction]
                 color_list.add(option, 1)
             }
-            
+
         }
 
         // for (var color_add in colormaps) {
@@ -361,6 +373,9 @@ class playGame extends Phaser.Scene {
             reload_data = false;
         }
 
+
+        var arrays_xy = []
+        var count = 0
         if (reload_data) {
             var recover_array = JSON.parse(localStorage.getItem('Array'));
             var recover_colormap = JSON.parse(localStorage.getItem('colormap_val'));
@@ -372,15 +387,43 @@ class playGame extends Phaser.Scene {
                     array_rects[ii][jj].last_pos_y = array_rects[ii][jj].y;
                     array_rects[ii][jj].setInteractive({ draggable: true });
                     array_rects[ii][jj].flag_interactive = true;
-
-
+                    arrays_xy[count] = [array_rects[ii][jj].x,recover_array[ii][jj].y]
+                    count++
 
                 }
             }
             var color_list = document.getElementById("optList")
 
+
+            // var duplicates = findDuplicates(arrays_xy)
             color_list.selectedIndex = recover_colormap
             color_list.onchange()
+
+            recover_array = array_rects
+            for (var ii = 0; ii < num_x; ii++) {
+                for (var jj = 0; jj < num_y; jj++) {
+    
+                    for (var ii1 = 0; ii1 < num_x; ii1++) {
+                        for (var jj1 = 0; jj1 < num_y; jj1++) {
+    
+                            var cond1 = recover_array[ii][jj].x == recover_array[ii1][jj1].x && recover_array[ii][jj].y == recover_array[ii1][jj1].y &&
+                            recover_array[ii][jj] !=recover_array[ii1][jj1] //&& recover_array[ii][jj].orig_pos_x != recover_array[ii1][jj1].orig_pos_x && 
+                            recover_array[ii][jj].orig_pos_y != recover_array[ii1][jj1].orig_pos_y
+    
+                            if (cond1) {
+                                console.log(recover_array[ii][jj])
+                                console.log(recover_array[ii1][jj1])
+                                recover_array[ii][jj].x = 0 //init_x + (num_x + 5) * spacer
+                                recover_array[ii][jj].y = 0
+
+                                recover_array[ii][jj].last_pos_x = recover_array[ii][jj].x;
+                                recover_array[ii][jj].last_pos_y = recover_array[ii][jj].y;
+                            }
+                        }
+                    }
+                }
+            }
+
 
         }
     }
