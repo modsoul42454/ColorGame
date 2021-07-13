@@ -30,12 +30,17 @@ spacer = 20
 num_x = 30
 num_y = 60
 var reload_data = true
-const difficulty_ratio = 0.98
 
 var array_rects
 var array_groups
 var distance_old = 0
 var playGame_class_var 
+var array_ii = Array()
+var array_jj = Array()
+var array_count = Array()
+var array_text_ii = [];
+var array_text_jj = [];
+var array_text = []
 function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -208,6 +213,10 @@ class playGame extends Phaser.Scene {
             }
         }
 
+        
+        localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
+            
+
     }
 
     offset_sliderChange() {
@@ -220,14 +229,15 @@ class playGame extends Phaser.Scene {
         var retVal = confirm("Do you want to randomize the grid ?");
         playGame_class_var
         if( retVal == true ) {
+            
             playGame_class_var.RandomizeGrid()
+            playGame_class_var.destroy_child_objects('Text')
+            playGame_class_var.post_randomization_clean_up_cycles = 30
            return true;
-        } else {
-           document.write ("User does not want to continue!");
-           return false;
         }
      }
     create() {
+        this.post_randomization_clean_up_cycles = 0
         playGame_class_var =this 
         this.dragScale = this.plugins.get('rexpinchplugin').add(this);
         var camera = this.cameras.main;
@@ -248,14 +258,7 @@ class playGame extends Phaser.Scene {
                 camera.scrollX -= drag1Vector.x / camera.zoom;
                 camera.scrollY -= drag1Vector.y / camera.zoom;
             }, this)
-        array_rects = createArray(num_x, num_y)
-        array_groups = createArray(num_x, num_y)
-        var array_ii = Array()
-        var array_jj = Array()
-        var array_count = Array()
-
-        var count = 0
-
+        
         this.input.dragTimeThreshold = 0.
         this.input.addPointer(4)
 
@@ -290,77 +293,17 @@ class playGame extends Phaser.Scene {
 
             color_list.add(option, 1)
         }
-        ColorMap_to_use = 'Moose'
-        if (ColorMap_to_use != 'Moose') { var ColorMap_to_use = eval(colormaps[1]) }
-
-        for (var ii = 0; ii < num_x; ii++) {
-            for (var jj = 0; jj < num_y; jj++) {
-
-                var hex_c = SetColorMapOfGrid(ColorMap_to_use, ii, jj, count);
-                // // console.log(hex)
-                // var r1 = this.add.rectangle(init_x + ii*sq_size, init_y + jj*sq_size, sq_size, sq_size, 0x6666ff );
-                var rect1 = this.add.rectangle(init_x + ii * (spacer), init_y + jj * spacer, sq_size, sq_size, hex_c);
-                rect1.fillColor = hex_c;
-                // var group = this.add.container()
-                // group.add(rect1)
-                // array_groups[ii][jj] = group
-
-                rect1.last_pos_x = rect1.x
-                rect1.last_pos_y = rect1.y
-                array_rects[ii][jj] = rect1
-
-                array_rects[ii][jj].orig_pos_x = array_rects[ii][jj].x
-                array_rects[ii][jj].orig_pos_y = array_rects[ii][jj].y
-
-
-                // array_rects[ii][jj].visible = false
-                // array_rects[ii][jj].disableInteractive()
-
-                array_rects[ii][jj].setInteractive({ draggable: true })
-                // array_rects[ii][jj].add.text('dsd')
-                array_ii.push(ii)
-                array_jj.push(jj)
-                array_count.push(count)
-                count++
-
-            }
+        this.ColorMap_to_use = 'Moose'
+        if (this.ColorMap_to_use != 'Moose') { 
+            this.ColorMap_to_use = eval(colormaps[1]) 
         }
+
+        
+        this.GenerateInitialGrid();
 
         this.input.on('pointerdown', this.PointerDown, this)
         // this.input.on('pointer2down', this.pointer2_down, this)
-        var recover_array = JSON.parse(localStorage.getItem('Array'))
-        if (recover_array == null){
-        reload_data = false
-        }
-        if (reload_data) {
-            var recover_array = JSON.parse(localStorage.getItem('Array'))
-            var recover_text_marking_array = JSON.parse(localStorage.getItem('text_array'))
-            var array_text_jj = JSON.parse(localStorage.getItem('array_text_jj'))
-            var array_text_ii = JSON.parse(localStorage.getItem('array_text_ii'))
-            for (var ii = 0; ii < num_x; ii++) {
-                for (var jj = 0; jj < num_y; jj++) {
-                    array_rects[ii][jj].x = recover_array[ii][jj].x
-                    array_rects[ii][jj].y = recover_array[ii][jj].y
-                    array_rects[ii][jj].last_pos_x = array_rects[ii][jj].x
-                    array_rects[ii][jj].last_pos_y = array_rects[ii][jj].y
-                    array_rects[ii][jj].setInteractive()
-                    array_rects[ii][jj].flag_interactive = true
-
-
-
-                }
-            }
-
-            for (var itx = 0; itx < recover_text_marking_array.length; itx++) {
-                var text_mark = recover_text_marking_array[itx]
-                var text = this.add.text(text_mark.x, text_mark.y, 'o', { color: rgbToHex(0, 0, 0) })
-                text.depth = text_mark.depth
-                array_rects[array_text_ii[itx]][array_text_jj[itx]].disableInteractive()
-                array_rects[array_text_ii[itx]][array_text_jj[itx]].flag_interactive = false
-                // array_rects[array_text_ii[itx]][array_text_jj[itx]].visible = true
-            }
-
-        }
+        this.ReloadData();
 
         // var count;
         // var ii;
@@ -374,49 +317,134 @@ class playGame extends Phaser.Scene {
     }
 
 
+    ReloadData() {
+        var recover_array = JSON.parse(localStorage.getItem('Array'));
+        if (recover_array == null) {
+            reload_data = false;
+        }
+
+        if (reload_data) {
+            var recover_array = JSON.parse(localStorage.getItem('Array'));
+            var recover_colormap = JSON.parse(localStorage.getItem('colormap_val'));
+            for (var ii = 0; ii < num_x; ii++) {
+                for (var jj = 0; jj < num_y; jj++) {
+                    array_rects[ii][jj].x = recover_array[ii][jj].x;
+                    array_rects[ii][jj].y = recover_array[ii][jj].y;
+                    array_rects[ii][jj].last_pos_x = array_rects[ii][jj].x;
+                    array_rects[ii][jj].last_pos_y = array_rects[ii][jj].y;
+                    array_rects[ii][jj].setInteractive({ draggable: true });
+                    array_rects[ii][jj].flag_interactive = true;
+
+
+
+                }
+            }
+            var color_list = document.getElementById("optList")
+
+            color_list.selectedIndex = recover_colormap
+            color_list.onchange()
+
+        }
+    }
+
+    destroy_child_objects(type_of_object){
+        for (var ii=0 ; ii<10; ii++){
+        for (var child_obj_indx in this.children.list)
+        {
+            var child_obj = this.children.list[child_obj_indx]
+            if (child_obj.type == type_of_object)
+            {
+                child_obj.destroy()
+            }
+        }
+
+    }}
+
+    GenerateInitialGrid() {
+            
+        // return
+        this.destroy_child_objects('Text')
+        this.destroy_child_objects('Rectangle')
+        var ColorMap_to_use = this.ColorMap_to_use
+        var count = 0
+        array_rects = createArray(num_x,num_y)
+        for (var ii = 0; ii < num_x; ii++) {
+            for (var jj = 0; jj < num_y; jj++) {
+
+                var hex_c = SetColorMapOfGrid(ColorMap_to_use, ii, jj, count);
+                // // console.log(hex)
+                // var r1 = this.add.rectangle(init_x + ii*sq_size, init_y + jj*sq_size, sq_size, sq_size, 0x6666ff );
+                var rect1 = this.add.rectangle(init_x + ii * (spacer), init_y + jj * spacer, sq_size, sq_size, hex_c);
+                rect1.fillColor = hex_c;
+                // var group = this.add.container()
+                // group.add(rect1)
+                // array_groups[ii][jj] = group
+                rect1.last_pos_x = rect1.x;
+                rect1.last_pos_y = rect1.y;
+                array_rects[ii][jj] = rect1;
+
+                array_rects[ii][jj].orig_pos_x = array_rects[ii][jj].x;
+                array_rects[ii][jj].orig_pos_y = array_rects[ii][jj].y;
+                array_rects[ii][jj].flag_interactive = true
+                array_rects[ii][jj].setInteractive({ draggable: true });
+                
+                array_ii.push(ii);
+                array_jj.push(jj);
+                array_count.push(count);
+                count++;
+
+            }
+        }
+        return { ii, jj, count };
+    }
+
     RandomizeGrid() {
-        if (true) {
+
+        this.destroy_child_objects('Text')
+        this.GenerateInitialGrid()
             var count = 0;
             this.array_text = [];
-            var array_text_ii = [];
-            var array_text_jj = [];
+           
+            
+            var difficulty_val = document.getElementById("difficulty_val")
+            var difficulty_ratio = Math.log10(parseInt(difficulty_val.value))
+
+            for (var ii = 0; ii < num_x; ii++)
+            for (var jj = 0; jj < num_y; jj++) {
+                {
+                    array_rects[ii][jj].flag_interactive = true;
+                    array_rects[ii][jj].setInteractive({ draggable: true });
+                }
+            }
+
+            console.log({difficulty_ratio})
             for (var ii = 0; ii < num_x; ii++)
                 for (var jj = 0; jj < num_y; jj++) {
                     {
                         array_rects[ii][jj].flag_interactive = true;
+                        array_rects[ii][jj].setInteractive({ draggable: true });
                         //  |
-                        if (Math.random() < difficulty_ratio) {
-                            // console.log( ii + ',' + jj)
+                        if (Math.random() > difficulty_ratio ) {
+                           
                             array_rects[ii][jj].x = init_x + Math.random() * num_x * (spacer);
                             array_rects[ii][jj].y = init_y + Math.random() * num_y * (spacer);
                             this.find_and_swap(array_rects[ii][jj], false);
                             array_rects[ii][jj].last_pos_x = array_rects[ii][jj].x;
                             array_rects[ii][jj].last_pos_y = array_rects[ii][jj].y;
-                            // array_rects[ii][jj].visible = false
-                            array_rects[ii][jj].flag_interactive = true;
-                            array_rects[ii][jj].setInteractive();
-                            // array_rects[ii][jj].color = rgbToHex(0,0,0)
-                            // this.add.text(array_rects[ii][jj].x , array_rects[ii][jj].y  ,
-                            //      'o', { color: rgbToHex(0,0,0) }).setOrigin(0, 0);
+                            array_rects[ii][jj].visible = true
+                         
+                          
                         }
                         else {
 
-                            var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'o', { color: rgbToHex(0, 0, 0) });
-                            text.depth = 1000;
-                            array_text_ii.push(ii);
-                            array_text_jj.push(jj);
-                            array_rects[ii][jj].disableInteractive();
-                            array_rects[ii][jj].flag_interactive = false;
-                            this.array_text.push(text);
                         }
                     }
                 }
             // console.log(count)
-            var string_data = JSON.stringify(this.array_text);
-            localStorage.setItem('text_array', string_data);
-            localStorage.setItem('array_text_ii', JSON.stringify(array_text_ii));
-            localStorage.setItem('array_text_jj', JSON.stringify(array_text_jj));
-        }
+            this.destroy_child_objects('Text')
+            var color_list = document.getElementById("optList")
+
+            color_list.onchange()
         
     }
 
@@ -507,7 +535,7 @@ class playGame extends Phaser.Scene {
 
     find_and_swap(rect_in,game_fully_initialized=false) {
 
-
+        
         var new_x = Math.round(rect_in.x / spacer) * spacer
         var new_y = Math.round(rect_in.y / spacer) * spacer
         var sub_found = false
@@ -541,6 +569,8 @@ class playGame extends Phaser.Scene {
             // // console.log(rect_in)
             var string_data = JSON.stringify(array_rects);
             localStorage.setItem('Array', string_data);
+            var color_list = document.getElementById("optList")
+            localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
             // recover_array = JSON.parse(string_data)
         }
         else {
@@ -560,7 +590,7 @@ class playGame extends Phaser.Scene {
     compute_score_and_save() {
         var total_distance = 0.0;
         var correct_num = 0;
-
+        
         for (var ii = 0; ii < num_x; ii++)
             for (var jj = 0; jj < num_y; jj++) {
                 {
@@ -569,11 +599,11 @@ class playGame extends Phaser.Scene {
                     var distance = Math.sqrt((array_rects[ii][jj].x - array_rects[ii][jj].orig_pos_x) ** 2 + (array_rects[ii][jj].y - array_rects[ii][jj].orig_pos_y) ** 2);
                     distance = distance / spacer
                     total_distance += distance;
-                    if (array_rects[ii][jj].x == array_rects[ii][jj].orig_pos_x && array_rects[ii][jj].y == array_rects[ii][jj].orig_pos_y) {
+                    if ( Math.abs(distance) <0.01) {
                         correct_num++;
                     }
 
-
+                    
                     if (distance == 0 && array_rects[ii][jj].flag_interactive) {
                         // console.log(distance)
                         // console.log(array_rects[ii][jj].flag_interactive)
@@ -589,7 +619,7 @@ class playGame extends Phaser.Scene {
 
                 }
             }
-
+        
         var str_score = correct_num + '/' + num_x * num_y + ', ' + total_distance.toFixed(2);
         var direction = -distance_old + total_distance
         distance_old = total_distance
@@ -607,6 +637,17 @@ class playGame extends Phaser.Scene {
             this.frameTime = 0
 
         }
+
+        // if  (this.post_randomization_clean_up_cycles > 0 )
+        // {
+        //     this.destroy_child_objects('Text')
+        //     this.post_randomization_clean_up_cycles--
+        //     for (var ii = 0; ii < num_x; ii++){
+        //     for (var jj = 0; jj < num_y; jj++) {
+        //         array_rects[ii][jj].flag_interactive = true
+        //     }
+        // }
+        // }
     }
 
 
