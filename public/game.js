@@ -786,7 +786,7 @@ class playGame extends Phaser.Scene {
             this.compute_score_and_save()
             this.frameTime = 0
 
-        }
+        
 
         if (this.game.scale.isPortrait) {
             this.game.scale.setGameSize(1080 / 1.5, 1920 / 1.5)
@@ -799,7 +799,7 @@ class playGame extends Phaser.Scene {
             rect_container.rotation = Math.PI / 2
             rect_container.x = (init_x + num_x * spacer) * 2
         }
-
+    }
     }
 
 
