@@ -41,8 +41,12 @@ var array_count = Array()
 var array_text_ii = [];
 var array_text_jj = [];
 var array_text = []
-
 var rect_container
+
+
+var database = firebase.database();
+
+
 function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
