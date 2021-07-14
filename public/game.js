@@ -782,7 +782,7 @@ class playGame extends Phaser.Scene {
 
     update(time, delta) {
         this.frameTime += delta
-        if (this.frameTime > 16) {
+        if (this.frameTime > 1000) {
             this.compute_score_and_save()
             this.frameTime = 0
 
