@@ -6,8 +6,8 @@ window.onload = function () {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
-            width: 650,
-            height: 650 * 2 - 200
+            width: Math.round(window.innerWidth),
+            height: Math.round(window.innerHeight)
         },
         physics: {
             default: "arcade",
@@ -535,9 +535,6 @@ class playGame extends Phaser.Scene {
                 array_rects_to_save[ii][jj].orig_pos_x = array_rects[ii][jj].orig_pos_x
                 array_rects_to_save[ii][jj].orig_pos_y = array_rects[ii][jj].orig_pos_y
 
-                // var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'x', { color: rgbToHex(0, 0, 0) })
-                // text.depth = 1
-                // rect_container.add(text)
 
                 array_ii.push(ii);
                 array_jj.push(jj);
@@ -630,54 +627,22 @@ class playGame extends Phaser.Scene {
                         // console.log('Draggin')
                         this.rect1.x = dragX
                         var yoffset = 0
-                        //     if ( (dragY - this.rect1.last_pos_y)>50 ){
-                        //         this.rect1.slider_offset_flag = true
-                        //     }
-                        //     console.log(this.slider_offset_val)
-                        //     if (this.rect1.slider_offset_flag){
-                        //     this.rect1.y = dragY - this.slider_offset_val
-                        // }else{
-                        //     this.rect1.y = dragY
-                        // }
-                        // var correction_y
 
-
-                        // var distance_drag = -dragY + this.rect1.last_pos_y
-
-                        // if (Math.abs(distance_drag < 0)) {
-                        //     correction_y = Math.min(1, distance_drag / this.slider_offset_val) * this.slider_offset_val
-                        // }
-                        // else {
-                        //     correction_y = Math.abs(-dragY + this.rect1.last_pos_y) / this.slider_offset_val * this.slider_offset_val
-                        // }
-
-
-                        // correction_y = correction_y < this.slider_offset ? correction_y=0 : correction_y
-                        // console.log(correction_y)
                         this.rect1.y = dragY - this.slider_offset_val //- correction_y
-                        // console.log( `${dragX}, ${this.cameras.main.scrollX}, ${this.cameras.main.worldView  }`)
 
-
-
-                        // camera.scrollY -= drag1Vector.y / camera.zoom;
 
                         var bound_rect = this.cameras.main.worldView
                         var cond1 = (bound_rect.right - dragX) < 10 || (dragX - bound_rect.left) < 10
-                        // dragX - offset1
+            
 
                         cond1 = cond1 && (dragX < init_x + (num_x - 2) * spacer) && (dragX > init_x)
                         if (cond1) {
-                            // console.log('Close to edge')
                             this.camera_scroll_x = 1 / this.cameras.main.zoom
-                            // this.cameras.main.scrollX -=  ;
                         }
 
                         this.rect1.depth = 1000
                         rect_container.bringToTop(this.rect1)
-                        // rect_container.reverse()
-                        // for (var icount =0 ; icount < num_y*num_x ; icount++){
-                        // rect_container.MoveUp(this.rect1)
-                        // }
+
 
                     }
                 });
@@ -720,21 +685,6 @@ class playGame extends Phaser.Scene {
                     if (array_rects[ii][jj] != rect_in & equals(array_rects[ii][jj].x, new_x) & equals(array_rects[ii][jj].y, new_y)) {
                         var intersected_array = array_rects[ii][jj]
                         sub_found = true
-
-                        // //
-                        // for (var ii1 = 0; ii1 < num_x; ii1++) {
-                        //     for (var jj1 = 0; jj1 < num_y; jj1++)
-
-                        //         if (Math.abs(array_rects[ii][jj].x - array_rects[ii1][jj1].x) < 0.1 && Math.abs(array_rects[ii][jj].y - array_rects[ii1][jj1].y) < 0.1) {
-                        //             console.log(array_rects[ii][jj])
-                        //             // array_rects[ii1][jj1].x = init_x + (num_x + 10 + 10*Math.random())*spacer
-                        //         }
-                        // }
-
-
-                        // //  
-
-
 
                     }
                 }
@@ -828,17 +778,12 @@ class playGame extends Phaser.Scene {
 
 
                     if (distance == 0 && array_rects[ii][jj].flag_interactive && this.dragging_flag == false) {
-                        // console.log(distance)
-                        // console.log(array_rects[ii][jj].flag_interactive)
                         var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'o', { color: rgbToHex(0, 0, 0) })
                         rect_container.add(text)
                         rect_container.depth = 1
                         text.depth = 1000
-                        // array_text_ii.push(ii)
-                        // array_text_jj.push(jj)
                         array_rects[ii][jj].disableInteractive();
                         array_rects[ii][jj].flag_interactive = false
-                        // this.array_text.push(text)
                     }
 
 
@@ -860,18 +805,9 @@ class playGame extends Phaser.Scene {
         if (this.frameTime > 2000) {
             this.compute_score_and_save()
             this.frameTime = 0
-
-            if (this.game.scale.isPortrait) {
-                this.game.scale.setGameSize(1080 / 1.5, 1920 / 1.5)
-                rect_container.rotation = Math.PI * 2
-                rect_container.x = 0
-            } else if (this.game.scale.isLandscape) {
-
-
-                this.game.scale.setGameSize(1920 / 1.5, 1080 / 1.5)
-                rect_container.rotation = Math.PI / 2
-                rect_container.x = (init_x + num_x * spacer) * 2
-            }
+            console.log(' ')
+            console.log(window.innerHeight)
+            console.log(window.innerWidth)
 
         }
 
