@@ -27,8 +27,8 @@ var sq_size = 20
 var init_x = 20
 var init_y = 20
 spacer = 20
-num_x = 30
-num_y = 60
+num_x = null
+num_y = null
 var reload_data = true
 
 var array_rects
@@ -404,9 +404,15 @@ class playGame extends Phaser.Scene {
             recover_array = array_rects
             for (var ii = 0; ii < num_x; ii++) {
                 for (var jj = 0; jj < num_y; jj++) {
+                    var rect_in = recover_array[ii][jj]
+                    rect_in.x = Math.round(rect_in.x / spacer) * spacer
+                    rect_in.y = Math.round(rect_in.y / spacer) * spacer
+
 
                     for (var ii1 = 0; ii1 < num_x; ii1++) {
                         for (var jj1 = 0; jj1 < num_y; jj1++) {
+
+
 
                             var cond1 = recover_array[ii][jj].x == recover_array[ii1][jj1].x && recover_array[ii][jj].y == recover_array[ii1][jj1].y &&
                                 recover_array[ii][jj] != recover_array[ii1][jj1] //&& recover_array[ii][jj].orig_pos_x != recover_array[ii1][jj1].orig_pos_x && 
@@ -415,8 +421,8 @@ class playGame extends Phaser.Scene {
                             if (cond1) {
                                 console.log(recover_array[ii][jj])
                                 console.log(recover_array[ii1][jj1])
-                                recover_array[ii][jj].x = 0 //init_x + (num_x + 5) * spacer
-                                recover_array[ii][jj].y = 0
+                                recover_array[ii][jj].x = -50 //init_x + (num_x + 5) * spacer
+                                recover_array[ii][jj].y = -50
 
                                 recover_array[ii][jj].last_pos_x = recover_array[ii][jj].x;
                                 recover_array[ii][jj].last_pos_y = recover_array[ii][jj].y;
@@ -443,6 +449,12 @@ class playGame extends Phaser.Scene {
     }
 
     GenerateInitialGrid() {
+        var Num_x_input = document.getElementById("num_x_id")
+        var Num_y_input = document.getElementById("num_y_id")
+        num_x = parseInt(Num_x_input.value)
+        num_y = parseInt(Num_y_input.value)
+
+
         rect_container = this.add.container(0, 0)
         // return
         this.destroy_child_objects('Text')
@@ -451,6 +463,9 @@ class playGame extends Phaser.Scene {
         var count = 0
         array_rects = createArray(num_x, num_y)
         array_rects_to_save = createArray(num_x, num_y)
+
+
+
         for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
 
@@ -782,23 +797,25 @@ class playGame extends Phaser.Scene {
 
     update(time, delta) {
         this.frameTime += delta
-        if (this.frameTime > 16) {
+        if (this.frameTime > 2000) {
             this.compute_score_and_save()
             this.frameTime = 0
 
+            if (this.game.scale.isPortrait) {
+                this.game.scale.setGameSize(1080 / 1.5, 1920 / 1.5)
+                rect_container.rotation = Math.PI * 2
+                rect_container.x = 0
+            } else if (this.game.scale.isLandscape) {
+
+
+                this.game.scale.setGameSize(1920 / 1.5, 1080 / 1.5)
+                rect_container.rotation = Math.PI / 2
+                rect_container.x = (init_x + num_x * spacer) * 2
+            }
+
         }
 
-        if (this.game.scale.isPortrait) {
-            this.game.scale.setGameSize(1080 / 1.5, 1920 / 1.5)
-            rect_container.rotation = Math.PI * 2
-            rect_container.x = 0
-        } else if (this.game.scale.isLandscape) {
 
-
-            this.game.scale.setGameSize(1920 / 1.5, 1080 / 1.5)
-            rect_container.rotation = Math.PI / 2
-            rect_container.x = (init_x + num_x * spacer) * 2
-        }
 
     }
 
