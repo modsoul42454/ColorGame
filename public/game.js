@@ -742,65 +742,64 @@ class playGame extends Phaser.Scene {
         var total_distance = 0.0;
         var correct_num = 0;
         var distance
-        if (this.dragging_flag == false) {
-            for (var ii = 0; ii < num_x; ii++)
-                for (var jj = 0; jj < num_y; jj++) {
-                    {
-                        distance = Math.sqrt((array_rects[ii][jj].x - array_rects[ii][jj].orig_pos_x) ** 2 + (array_rects[ii][jj].y - array_rects[ii][jj].orig_pos_y) ** 2);
-                        distance = distance / spacer
-                        total_distance += distance;
-                        if (Math.abs(distance) < 0.01) {
-                            correct_num++;
-                        }
-
-
-                        if (distance == 0 && array_rects[ii][jj].flag_interactive && this.dragging_flag == false) {
-                            // console.log(distance)
-                            // console.log(array_rects[ii][jj].flag_interactive)
-                            var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'o', { color: rgbToHex(0, 0, 0) })
-                            rect_container.add(text)
-                            rect_container.depth = 1
-                            text.depth = 1000
-                            // array_text_ii.push(ii)
-                            // array_text_jj.push(jj)
-                            array_rects[ii][jj].disableInteractive();
-                            array_rects[ii][jj].flag_interactive = false
-                            // this.array_text.push(text)
-                        }
-
-
+        for (var ii = 0; ii < num_x; ii++)
+            for (var jj = 0; jj < num_y; jj++) {
+                {
+                    distance = Math.sqrt((array_rects[ii][jj].x - array_rects[ii][jj].orig_pos_x) ** 2 + (array_rects[ii][jj].y - array_rects[ii][jj].orig_pos_y) ** 2);
+                    distance = distance / spacer
+                    total_distance += distance;
+                    if (Math.abs(distance) < 0.01) {
+                        correct_num++;
                     }
-                }
 
-            var str_score = correct_num + '/' + num_x * num_y + ', ' + total_distance.toFixed(2);
-            var direction = -distance_old + total_distance
-            distance_old = total_distance
-            this.events.emit('addScore', { str_score, direction });
-            // array_rects )
-        }
+
+                    if (distance == 0 && array_rects[ii][jj].flag_interactive && this.dragging_flag == false) {
+                        // console.log(distance)
+                        // console.log(array_rects[ii][jj].flag_interactive)
+                        var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'o', { color: rgbToHex(0, 0, 0) })
+                        rect_container.add(text)
+                        rect_container.depth = 1
+                        text.depth = 1000
+                        // array_text_ii.push(ii)
+                        // array_text_jj.push(jj)
+                        array_rects[ii][jj].disableInteractive();
+                        array_rects[ii][jj].flag_interactive = false
+                        // this.array_text.push(text)
+                    }
+
+
+                }
+            }
+
+        var str_score = correct_num + '/' + num_x * num_y + ', ' + total_distance.toFixed(2);
+        var direction = -distance_old + total_distance
+        distance_old = total_distance
+        this.events.emit('addScore', { str_score, direction });
+        // array_rects )
+
 
     }
 
     update(time, delta) {
         this.frameTime += delta
-        if (this.frameTime > 1000) {
+        if (this.frameTime > 16) {
             this.compute_score_and_save()
             this.frameTime = 0
 
-
-
-            if (this.game.scale.isPortrait) {
-                this.game.scale.setGameSize(1080 / 1.5, 1920 / 1.5)
-                rect_container.rotation = Math.PI * 2
-                rect_container.x = 0
-            } else if (this.game.scale.isLandscape) {
-
-
-                this.game.scale.setGameSize(1920 / 1.5, 1080 / 1.5)
-                rect_container.rotation = Math.PI / 2
-                rect_container.x = (init_x + num_x * spacer) * 2
-            }
         }
+
+        if (this.game.scale.isPortrait) {
+            this.game.scale.setGameSize(1080 / 1.5, 1920 / 1.5)
+            rect_container.rotation = Math.PI * 2
+            rect_container.x = 0
+        } else if (this.game.scale.isLandscape) {
+
+
+            this.game.scale.setGameSize(1920 / 1.5, 1080 / 1.5)
+            rect_container.rotation = Math.PI / 2
+            rect_container.x = (init_x + num_x * spacer) * 2
+        }
+
     }
 
 
