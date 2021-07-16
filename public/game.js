@@ -7,7 +7,7 @@ window.onload = function () {
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
             width: 650,
-            height: 650 * 2
+            height: 650 * 2 - 200
         },
         physics: {
             default: "arcade",
@@ -44,6 +44,7 @@ var array_text_jj = [];
 var array_text = []
 
 var rect_container
+total_time = 0
 function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -288,8 +289,13 @@ class playGame extends Phaser.Scene {
                 camera.zoom *= scaleFactor;
                 // console.log(camera.scrollX)
                 var drag1Vector = dragScale.drag1Vector;
+
                 camera.scrollX -= drag1Vector.x / camera.zoom;
+
                 camera.scrollY -= drag1Vector.y / camera.zoom;
+
+
+
             }, this)
 
         this.input.dragTimeThreshold = 0.
@@ -319,6 +325,11 @@ class playGame extends Phaser.Scene {
             'flag', 'prism']
         var color_list = document.getElementById("optList")
         color_list.onchange = this.change_color
+
+        // var color_next = document.getElementById("optList")
+        color_list.onchange = this.change_color
+
+
         for (var color_add in colormaps) {
 
 
@@ -351,12 +362,19 @@ class playGame extends Phaser.Scene {
         }
 
 
+        var Num_x_input = document.getElementById("num_x_id")
+        var Num_y_input = document.getElementById("num_y_id")
+        var test_num_x = JSON.parse(localStorage.getItem('num_x'));
+        if (test_num_x != null) {
+            Num_x_input.value = JSON.parse(localStorage.getItem('num_x'));
+            Num_y_input.value = JSON.parse(localStorage.getItem('num_y'));
+        }
         this.GenerateInitialGrid();
 
         this.input.on('pointerdown', this.PointerDown, this)
         // this.input.on('pointer2down', this.pointer2_down, this)
         this.ReloadData();
-
+        this.change_color();
         // var count;
         // var ii;
         // var jj;
@@ -365,9 +383,23 @@ class playGame extends Phaser.Scene {
         // var text;
         // ({ count, ii, jj, array_text_jj, array_text_ii, text, ii, jj } = this.newMethod(count, array_text_ii, array_text_jj, ii, jj, text));
 
-
+        var Spread_button = document.getElementById("Spread_button")
+        Spread_button.onclick = this.spreadtiles
     }
 
+    spreadtiles() {
+        this.max_x = init_x + (num_x) * spacer
+        this.max_y = init_y + (num_y) * spacer
+        for (var ii = 0; ii < num_x; ii++) {
+            for (var jj = 0; jj < num_y; jj++) {
+                if (array_rects[ii][jj].flag_interactive) {
+                    array_rects[ii][jj].x = 2 * (Math.random() - 0.5) * this.max_x / 2
+                    array_rects[ii][jj].y = 2 * (Math.random() - 0.5) * this.max_y / 2
+                }
+            }
+        }
+
+    }
 
     ReloadData() {
         var recover_array = JSON.parse(localStorage.getItem('Array'));
@@ -379,6 +411,12 @@ class playGame extends Phaser.Scene {
         var arrays_xy = []
         var count = 0
         if (reload_data) {
+
+            var Num_x_input = document.getElementById("num_x_id")
+            var Num_y_input = document.getElementById("num_y_id")
+            Num_x_input.value = JSON.parse(localStorage.getItem('num_x'));
+            Num_y_input.value = JSON.parse(localStorage.getItem('num_y'));
+
             var recover_array = JSON.parse(localStorage.getItem('Array'));
             var recover_colormap = JSON.parse(localStorage.getItem('colormap_val'));
             for (var ii = 0; ii < num_x; ii++) {
@@ -431,9 +469,10 @@ class playGame extends Phaser.Scene {
                     }
                 }
             }
-
+            this.SaveGame()
 
         }
+
     }
 
     destroy_child_objects(type_of_object) {
@@ -453,8 +492,8 @@ class playGame extends Phaser.Scene {
         var Num_y_input = document.getElementById("num_y_id")
         num_x = parseInt(Num_x_input.value)
         num_y = parseInt(Num_y_input.value)
-
-
+        localStorage.setItem('num_x', JSON.stringify(num_x));
+        localStorage.setItem('num_y', JSON.stringify(num_y));
         rect_container = this.add.container(0, 0)
         // return
         this.destroy_child_objects('Text')
@@ -465,7 +504,8 @@ class playGame extends Phaser.Scene {
         array_rects_to_save = createArray(num_x, num_y)
 
 
-
+        this.max_x = init_x + (num_x) * spacer
+        this.max_y = init_y + (num_y) * spacer
         for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
 
@@ -585,6 +625,7 @@ class playGame extends Phaser.Scene {
                     this.dragging_flag = true
                 })
                 this.rect1.on('drag', (pointer, dragX, dragY) => {
+                    // total_time += delta
                     if (!this.dragScale.isPinched) {
                         // console.log('Draggin')
                         this.rect1.x = dragX
@@ -743,14 +784,32 @@ class playGame extends Phaser.Scene {
 
         }
         if (game_fully_initialized) {
-            this.compute_score_and_save();
-            var string_data = JSON.stringify(array_rects_to_save);
-            localStorage.setItem('Array', string_data);
-            var color_list = document.getElementById("optList")
-            localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
+            this.SaveGame();
 
 
         }
+    }
+
+    SaveGame() {
+        this.compute_score_and_save();
+        for (var ii = 0; ii < num_x; ii++) {
+            for (var jj = 0; jj < num_y; jj++) {
+
+                array_rects_to_save[ii][jj].x = array_rects[ii][jj].x
+                array_rects_to_save[ii][jj].y = array_rects[ii][jj].y
+
+                array_rects_to_save[ii][jj].orig_pos_x = array_rects[ii][jj].orig_pos_x
+                array_rects_to_save[ii][jj].orig_pos_y = array_rects[ii][jj].orig_pos_y
+            }
+        }
+        var string_data = JSON.stringify(array_rects_to_save);
+        localStorage.setItem('Array', string_data);
+        var color_list = document.getElementById("optList");
+        localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
+        var Num_x_input = document.getElementById("num_x_id")
+        var Num_y_input = document.getElementById("num_y_id")
+        Num_x_input.value = JSON.parse(localStorage.getItem('num_x'));
+        Num_y_input.value = JSON.parse(localStorage.getItem('num_y'));
     }
 
     compute_score_and_save() {
@@ -797,6 +856,7 @@ class playGame extends Phaser.Scene {
 
     update(time, delta) {
         this.frameTime += delta
+
         if (this.frameTime > 2000) {
             this.compute_score_and_save()
             this.frameTime = 0
