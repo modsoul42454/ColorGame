@@ -1,7 +1,7 @@
 window.onload = function () {
     let gameConfig = {
         type: Phaser.AUTO,
-        backgroundColor: 0x87ceeb,
+        backgroundColor: '#000000',
         scale: {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH,
