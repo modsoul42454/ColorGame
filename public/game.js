@@ -49,6 +49,16 @@ function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
 }
+
+
+function isPortrait() {
+    return window.innerHeight > window.innerWidth;
+}
+
+function isLandscape() {
+    return (window.orientation === 90 || window.orientation === -90);
+}
+
 const findDuplicates = (arr) => {
     let sorted_arr = arr.slice().sort(); // You can define the comparing function here. 
     // JS by default uses a crappy string compare.
@@ -817,5 +827,4 @@ class playGame extends Phaser.Scene {
 
 
 }
-
 
