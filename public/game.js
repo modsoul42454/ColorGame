@@ -7,7 +7,7 @@ window.onload = function () {
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
             width: Math.round(window.innerWidth),
-            height: Math.round(window.innerHeight)
+            height: Math.round(window.innerHeight)-200
         },
         physics: {
             default: "arcade",
@@ -385,6 +385,7 @@ class playGame extends Phaser.Scene {
             Num_x_input.value = JSON.parse(localStorage.getItem('num_x'));
             Num_y_input.value = JSON.parse(localStorage.getItem('num_y'));
         }
+        
         this.GenerateInitialGrid();
 
         this.input.on('pointerdown', this.PointerDown, this)
@@ -520,14 +521,17 @@ class playGame extends Phaser.Scene {
         localStorage.setItem('num_x', JSON.stringify(num_x));
         localStorage.setItem('num_y', JSON.stringify(num_y));
         rect_container = this.add.container(0, 0)
-        // return
+        // spacer = Math.floor(Math.min(Math.round(window.innerWidth)/num_x, Math.round(window.innerHeight)/num_y))
+        // sq_size = spacer
+        // init_x = spacer
+        // init_y = spacer
         this.destroy_child_objects('Text')
         this.destroy_child_objects('Rectangle')
         var ColorMap_to_use = this.ColorMap_to_use
         var count = 0
         array_rects = createArray(num_x, num_y)
         array_rects_to_save = createArray(num_x, num_y)
-
+        
 
         this.max_x = init_x + (num_x) * spacer
         this.max_y = init_y + (num_y) * spacer
@@ -847,17 +851,16 @@ class playGame extends Phaser.Scene {
 
     update(time, delta) {
         this.frameTime += delta
-//         //console.log(isDragging)
-        // if ( isDragging == true ){
+        if ( (Date.now() - last_pointer_down_time)/1000<10  ){
+            
+            total_time +=delta
+           
+        }
        
         if (this.frameTime > 1000) {
             // this.compute_score_and_save()
             this.frameTime = 0
-            if ( (Date.now() - last_pointer_down_time)/1000<10  ){
-            
-                total_time +=delta
-                time_id_element.innerText = (total_time/1000).toFixed(2) + ' s'
-            }
+            time_id_element.innerText = (total_time/1000).toFixed(2) + ' s'
 
         }
 

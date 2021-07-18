@@ -1,0 +1,17 @@
+{
+    "name": "ColorSorter",
+    "description": "Color sorting game",
+    "start_url": "/",
+    "background_color": "#000000",
+    "theme_color": "#0f4a73",
+    "display": "standalone",
+    "icons": [{
+      "src": "icon1_192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },{
+        "src": "icon1_512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }]
+  }
