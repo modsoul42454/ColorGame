@@ -847,17 +847,16 @@ class playGame extends Phaser.Scene {
 
     update(time, delta) {
         this.frameTime += delta
-//         //console.log(isDragging)
-        // if ( isDragging == true ){
+        if ( (Date.now() - last_pointer_down_time)/1000<10  ){
+            
+            total_time +=delta
+           
+        }
        
         if (this.frameTime > 1000) {
             // this.compute_score_and_save()
             this.frameTime = 0
-            if ( (Date.now() - last_pointer_down_time)/1000<10  ){
-            
-                total_time +=delta
                 time_id_element.innerText = (total_time/1000).toFixed(2) + ' s'
-            }
 
         }
 
