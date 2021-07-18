@@ -45,6 +45,11 @@ var array_text = []
 var isDragging = false
 var rect_container
 var total_time = 0
+var last_pointer_down_time
+var game_score 
+var correct_num = 0;
+var distance_orig = 0
+var time_id_element = document.getElementById('time_id')
 function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -280,6 +285,7 @@ class playGame extends Phaser.Scene {
     }
     create() {
 
+        time_id_element = document.getElementById('time_id')
         this.post_randomization_clean_up_cycles = 0
         playGame_class_var = this
         this.dragScale = this.plugins.get('rexpinchplugin').add(this);
@@ -297,7 +303,7 @@ class playGame extends Phaser.Scene {
                 }
                 var scaleFactor = dragScale.scaleFactor;
                 camera.zoom *= scaleFactor;
-                // console.log(camera.scrollX)
+                // //console.log(camera.scrollX)
                 var drag1Vector = dragScale.drag1Vector;
 
                 camera.scrollX -= drag1Vector.x / camera.zoom;
@@ -470,8 +476,8 @@ class playGame extends Phaser.Scene {
                                 recover_array[ii][jj].orig_pos_y != recover_array[ii1][jj1].orig_pos_y
 
                                 if (cond1) {
-                                    console.log(recover_array[ii][jj])
-                                    console.log(recover_array[ii1][jj1])
+                                    //console.log(recover_array[ii][jj])
+                                    //console.log(recover_array[ii1][jj1])
                                     recover_array[ii][jj].x = -50 //init_x + (num_x + 5) * spacer
                                     recover_array[ii][jj].y = -50
 
@@ -529,7 +535,7 @@ class playGame extends Phaser.Scene {
             for (var jj = 0; jj < num_y; jj++) {
 
                 var hex_c = SetColorMapOfGrid(ColorMap_to_use, ii, jj, count);
-                // // console.log(hex)
+                // // //console.log(hex)
                 // var r1 = this.add.rectangle(init_x + ii*sq_size, init_y + jj*sq_size, sq_size, sq_size, 0x6666ff );
                 var rect1 = this.add.rectangle(init_x + ii * (spacer), init_y + jj * spacer, sq_size, sq_size, hex_c);
                 rect1.depth = 10
@@ -585,7 +591,7 @@ class playGame extends Phaser.Scene {
                 }
             }
 
-        console.log({ difficulty_ratio })
+        //console.log({ difficulty_ratio })
         for (var ii = 0; ii < num_x; ii++)
             for (var jj = 0; jj < num_y; jj++) {
                 {
@@ -614,7 +620,7 @@ class playGame extends Phaser.Scene {
                     }
                 }
             }
-        // console.log(count)
+        // //console.log(count)
         this.destroy_child_objects('Text')
         var color_list = document.getElementById("optList")
 
@@ -623,11 +629,12 @@ class playGame extends Phaser.Scene {
     }
 
     pointer2_down() {
-        // console.log('Pointer 2 down')
+        // //console.log('Pointer 2 down')
     }
     PointerDown(pointer, targets) {
-
-        // console.log('isPinched' + this.dragScale.isPinched)
+        last_pointer_down_time = Date.now()
+        
+        // //console.log('isPinched' + this.dragScale.isPinched)
         if (this.input.pointer1.active && !this.input.pointer2.active && !this.dragScale.isPinched) {
             if (targets[0] != null) {
 
@@ -639,12 +646,18 @@ class playGame extends Phaser.Scene {
                 this.rect1.on('dragstart', (pointer, dragX, dragY) => {
                     this.slider_offset_flag = false
                     isDragging = true
+                   
+
                 })
                 this.rect1.on('drag', (pointer, dragX, dragY) => {
                     if (!this.dragScale.isPinched) {
-                        // console.log('Draggin')
+                        // //console.log('Draggin')
                         this.rect1.x = dragX
                         var yoffset = 0
+                        if (isDragging == false){
+                            distance_orig = Math.sqrt((this.rect1.x - this.rect1.orig_pos_x) ** 2 + (this.rect1.y - this.rect1.orig_pos_y) ** 2);
+                            //console.log({distance_orig})
+                        }
                         isDragging = true
                         this.rect1.y = dragY - this.slider_offset_val //- correction_y
 
@@ -659,13 +672,22 @@ class playGame extends Phaser.Scene {
                         }
 
                         this.rect1.depth = 1000
+
+                        var ddistance = distance_orig - (Math.sqrt((this.rect1.x - this.rect1.orig_pos_x) ** 2 + (this.rect1.y - this.rect1.orig_pos_y) ** 2))
+                        ddistance = ddistance / spacer
+                        
+                        //console.log({ddistance,distance_orig})
+
+                        var str_score = correct_num + '/' + num_x * num_y + ', ' + (game_score + ddistance).toFixed(2);
+                        this.events.emit('addScore', { str_score, ddistance });
+
                         rect_container.bringToTop(this.rect1)
 
 
                     }
                 });
                 this.rect1.on('dragend', (pointer, dragX, dragY) => {
-                    // console.log('end draggin')
+                    // //console.log('end draggin')
                     this.rect1.depth = 10
                     this.find_and_swap(this.rect1, true)
                     this.rect1.slider_offset_flag = false
@@ -787,7 +809,7 @@ class playGame extends Phaser.Scene {
 
     compute_score_and_save() {
         var total_distance = 0.0;
-        var correct_num = 0;
+        correct_num = 0
         var distance
         for (var ii = 0; ii < num_x; ii++)
             for (var jj = 0; jj < num_y; jj++) {
@@ -816,6 +838,7 @@ class playGame extends Phaser.Scene {
         var str_score = correct_num + '/' + num_x * num_y + ', ' + total_distance.toFixed(2);
         var direction = -distance_old + total_distance
         distance_old = total_distance
+        game_score = total_distance
         this.events.emit('addScore', { str_score, direction });
         // array_rects )
 
@@ -824,17 +847,17 @@ class playGame extends Phaser.Scene {
 
     update(time, delta) {
         this.frameTime += delta
-        console.log(isDragging)
-        if ( isDragging == true ){
-            total_time +=delta
-            document.getElementById('time_id').innerText = (total_time/1000).toFixed(2) + ' s'
-        }
-        if (this.frameTime > 16) {
-            this.compute_score_and_save()
+//         //console.log(isDragging)
+        // if ( isDragging == true ){
+       
+        if (this.frameTime > 1000) {
+            // this.compute_score_and_save()
             this.frameTime = 0
-            console.log(' ')
-            console.log(window.innerHeight)
-            console.log(window.innerWidth)
+            if ( (Date.now() - last_pointer_down_time)/1000<10  ){
+            
+                total_time +=delta
+                time_id_element.innerText = (total_time/1000).toFixed(2) + ' s'
+            }
 
         }
 
