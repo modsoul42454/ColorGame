@@ -42,9 +42,9 @@ var array_count = Array()
 var array_text_ii = [];
 var array_text_jj = [];
 var array_text = []
-
+var isDragging = false
 var rect_container
-total_time = 0
+var total_time = 0
 function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -287,7 +287,7 @@ class playGame extends Phaser.Scene {
         this.pinch_zoom_flag = false
         this.dragScale.dragThreshold = 1
         this.frameTime = 0
-        this.dragging_flag = false
+        isDragging = false
         this.dragScale
             .on('pinch', function (dragScale) {
                 if (!this.dragObj === null) {
@@ -420,68 +420,77 @@ class playGame extends Phaser.Scene {
 
         var arrays_xy = []
         var count = 0
-        if (reload_data) {
+        try {
+            if (reload_data) {
 
-            var Num_x_input = document.getElementById("num_x_id")
-            var Num_y_input = document.getElementById("num_y_id")
-            Num_x_input.value = JSON.parse(localStorage.getItem('num_x'));
-            Num_y_input.value = JSON.parse(localStorage.getItem('num_y'));
+                var Num_x_input = document.getElementById("num_x_id")
+                var Num_y_input = document.getElementById("num_y_id")
+                Num_x_input.value = JSON.parse(localStorage.getItem('num_x'));
+                Num_y_input.value = JSON.parse(localStorage.getItem('num_y'));
 
-            var recover_array = JSON.parse(localStorage.getItem('Array'));
-            var recover_colormap = JSON.parse(localStorage.getItem('colormap_val'));
-            for (var ii = 0; ii < num_x; ii++) {
-                for (var jj = 0; jj < num_y; jj++) {
-                    array_rects[ii][jj].x = recover_array[ii][jj].x;
-                    array_rects[ii][jj].y = recover_array[ii][jj].y;
-                    array_rects[ii][jj].last_pos_x = array_rects[ii][jj].x;
-                    array_rects[ii][jj].last_pos_y = array_rects[ii][jj].y;
-                    array_rects[ii][jj].setInteractive({ draggable: true });
-                    array_rects[ii][jj].flag_interactive = true;
-                    arrays_xy[count] = [array_rects[ii][jj].x, recover_array[ii][jj].y]
-                    count++
+                var recover_array = JSON.parse(localStorage.getItem('Array'));
+                var recover_colormap = JSON.parse(localStorage.getItem('colormap_val'));
+                total_time = JSON.parse(localStorage.getItem('total_time'));
 
+                for (var ii = 0; ii < num_x; ii++) {
+                    for (var jj = 0; jj < num_y; jj++) {
+                        array_rects[ii][jj].x = recover_array[ii][jj].x;
+                        array_rects[ii][jj].y = recover_array[ii][jj].y;
+                        array_rects[ii][jj].last_pos_x = array_rects[ii][jj].x;
+                        array_rects[ii][jj].last_pos_y = array_rects[ii][jj].y;
+                        array_rects[ii][jj].setInteractive({ draggable: true });
+                        array_rects[ii][jj].flag_interactive = true;
+                        arrays_xy[count] = [array_rects[ii][jj].x, recover_array[ii][jj].y]
+                        count++
+
+                    }
                 }
-            }
-            var color_list = document.getElementById("optList")
+                var color_list = document.getElementById("optList")
 
 
-            // var duplicates = findDuplicates(arrays_xy)
-            color_list.selectedIndex = recover_colormap
-            color_list.onchange()
+                // var duplicates = findDuplicates(arrays_xy)
+                color_list.selectedIndex = recover_colormap
+                color_list.onchange()
 
-            recover_array = array_rects
-            for (var ii = 0; ii < num_x; ii++) {
-                for (var jj = 0; jj < num_y; jj++) {
-                    var rect_in = recover_array[ii][jj]
-                    rect_in.x = Math.round(rect_in.x / spacer) * spacer
-                    rect_in.y = Math.round(rect_in.y / spacer) * spacer
-
-
-                    for (var ii1 = 0; ii1 < num_x; ii1++) {
-                        for (var jj1 = 0; jj1 < num_y; jj1++) {
+                recover_array = array_rects
+                for (var ii = 0; ii < num_x; ii++) {
+                    for (var jj = 0; jj < num_y; jj++) {
+                        var rect_in = recover_array[ii][jj]
+                        rect_in.x = Math.round(rect_in.x / spacer) * spacer
+                        rect_in.y = Math.round(rect_in.y / spacer) * spacer
 
 
+                        for (var ii1 = 0; ii1 < num_x; ii1++) {
+                            for (var jj1 = 0; jj1 < num_y; jj1++) {
 
-                            var cond1 = recover_array[ii][jj].x == recover_array[ii1][jj1].x && recover_array[ii][jj].y == recover_array[ii1][jj1].y &&
-                                recover_array[ii][jj] != recover_array[ii1][jj1] //&& recover_array[ii][jj].orig_pos_x != recover_array[ii1][jj1].orig_pos_x && 
-                            recover_array[ii][jj].orig_pos_y != recover_array[ii1][jj1].orig_pos_y
 
-                            if (cond1) {
-                                console.log(recover_array[ii][jj])
-                                console.log(recover_array[ii1][jj1])
-                                recover_array[ii][jj].x = -50 //init_x + (num_x + 5) * spacer
-                                recover_array[ii][jj].y = -50
 
-                                recover_array[ii][jj].last_pos_x = recover_array[ii][jj].x;
-                                recover_array[ii][jj].last_pos_y = recover_array[ii][jj].y;
+                                var cond1 = recover_array[ii][jj].x == recover_array[ii1][jj1].x && recover_array[ii][jj].y == recover_array[ii1][jj1].y &&
+                                    recover_array[ii][jj] != recover_array[ii1][jj1] //&& recover_array[ii][jj].orig_pos_x != recover_array[ii1][jj1].orig_pos_x && 
+                                recover_array[ii][jj].orig_pos_y != recover_array[ii1][jj1].orig_pos_y
+
+                                if (cond1) {
+                                    console.log(recover_array[ii][jj])
+                                    console.log(recover_array[ii1][jj1])
+                                    recover_array[ii][jj].x = -50 //init_x + (num_x + 5) * spacer
+                                    recover_array[ii][jj].y = -50
+
+                                    recover_array[ii][jj].last_pos_x = recover_array[ii][jj].x;
+                                    recover_array[ii][jj].last_pos_y = recover_array[ii][jj].y;
+                                }
                             }
                         }
                     }
                 }
+                // this.SaveGame()
+
             }
-            this.SaveGame()
+        }
+        catch
+        {
 
         }
+        this.SaveGame()
 
     }
 
@@ -629,21 +638,20 @@ class playGame extends Phaser.Scene {
                 this.rect1 = this.dragObj
                 this.rect1.on('dragstart', (pointer, dragX, dragY) => {
                     this.slider_offset_flag = false
-                    this.dragging_flag = true
+                    isDragging = true
                 })
                 this.rect1.on('drag', (pointer, dragX, dragY) => {
-                    // total_time += delta
                     if (!this.dragScale.isPinched) {
                         // console.log('Draggin')
                         this.rect1.x = dragX
                         var yoffset = 0
-
+                        isDragging = true
                         this.rect1.y = dragY - this.slider_offset_val //- correction_y
 
 
                         var bound_rect = this.cameras.main.worldView
                         var cond1 = (bound_rect.right - dragX) < 10 || (dragX - bound_rect.left) < 10
-            
+
 
                         cond1 = cond1 && (dragX < init_x + (num_x - 2) * spacer) && (dragX > init_x)
                         if (cond1) {
@@ -661,7 +669,7 @@ class playGame extends Phaser.Scene {
                     this.rect1.depth = 10
                     this.find_and_swap(this.rect1, true)
                     this.rect1.slider_offset_flag = false
-                    this.dragging_flag = false
+                    isDragging = false
                 })
 
 
@@ -766,10 +774,15 @@ class playGame extends Phaser.Scene {
         localStorage.setItem('Array', string_data);
         var color_list = document.getElementById("optList");
         localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
+        localStorage.setItem('total_time',JSON.stringify(total_time));
         var Num_x_input = document.getElementById("num_x_id")
         var Num_y_input = document.getElementById("num_y_id")
-        Num_x_input.value = JSON.parse(localStorage.getItem('num_x'));
-        Num_y_input.value = JSON.parse(localStorage.getItem('num_y'));
+        num_x = parseInt(Num_x_input.value)
+        num_y = parseInt(Num_y_input.value)
+        localStorage.setItem('num_x', JSON.stringify(num_x));
+        localStorage.setItem('num_y', JSON.stringify(num_y));
+
+        
     }
 
     compute_score_and_save() {
@@ -787,7 +800,7 @@ class playGame extends Phaser.Scene {
                     }
 
 
-                    if (distance == 0 && array_rects[ii][jj].flag_interactive && this.dragging_flag == false) {
+                    if (distance == 0 && array_rects[ii][jj].flag_interactive && isDragging == false) {
                         var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'o', { color: rgbToHex(0, 0, 0) })
                         rect_container.add(text)
                         rect_container.depth = 1
@@ -811,8 +824,12 @@ class playGame extends Phaser.Scene {
 
     update(time, delta) {
         this.frameTime += delta
-
-        if (this.frameTime > 2000) {
+        console.log(isDragging)
+        if ( isDragging == true ){
+            total_time +=delta
+            document.getElementById('time_id').innerText = (total_time/1000).toFixed(2) + ' s'
+        }
+        if (this.frameTime > 16) {
             this.compute_score_and_save()
             this.frameTime = 0
             console.log(' ')
