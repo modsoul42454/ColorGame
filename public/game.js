@@ -581,6 +581,14 @@ class playGame extends Phaser.Scene {
 
             }
         }
+
+        if (isLandscape){
+            rect_container.rotation = Math.PI / 2
+            rect_container.x = (init_x + num_x * spacer) * 2
+            marker_container.rotation = rect_container.rotation
+            marker_container.x = rect_container.x
+        }
+
         return { ii, jj, count };
     }
 
@@ -866,7 +874,23 @@ class playGame extends Phaser.Scene {
             total_time +=delta
            
         }
-       
+        // if (isLandscape){
+        //     // width: Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
+        //     // height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
+        //     this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
+        //     Math.round(window.innerHeight) -10)
+        //     rect_container.rotation = Math.PI / 2
+        //     rect_container.x = (init_x + num_x * spacer) * 2
+        //     marker_container.rotation = rect_container.rotation
+        //     marker_container.x = rect_container.x
+        // }else{
+        //     this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
+        //     Math.round(window.innerHeight) -10)
+        //     rect_container.rotation = 0
+        //     rect_container.x = 0
+        //     marker_container.rotation = rect_container.rotation
+        //     marker_container.x = rect_container.x 
+        // }
         if (this.frameTime > 1000) {
             // this.compute_score_and_save()
             this.frameTime = 0

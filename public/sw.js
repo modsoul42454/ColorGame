@@ -4,7 +4,9 @@ var filesToCache = [
   '/',
   '/index.html',
   '/game.js',
-  'https://cdn.jsdelivr.net/gh/photonstorm/phaser@3.10.1/dist/phaser.min.js'
+  '/dist/phaser.js',
+  'js-colormaps/js-colormaps.js'
+
 ];
 self.addEventListener('install', function(event) {
   console.log('sw install');

@@ -70,8 +70,51 @@
 </head>
 
 <body>
-    <!-- The Modal -->
-    <div id="myModal" class="modal">
+    <script src="dist/phaser.js"></script>
+    <script src="js-colormaps/js-colormaps.js"></script>
+
+    <script src="game.js"></script>
+
+
+    <center>
+    <select class="form-control" id="optList" name="selectbasic"></select>
+    <br>
+    <button type="button" id='ForceReoad' onclick="optList.selectedIndex-- ; optList.onchange()"">Prev Cmap</button>
+    <button type="button" id='ForceReoad' onclick="optList.selectedIndex++ ; optList.onchange()">Next Cmap</button>
+    <br>
+    <button type="button" id='ShowMark'>Show Markers</button>
+    <label id="time_id">0 s</label>
+   
+    
+    <div id="thegame"></div>
+    <center>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <label for="num_x_id">Num X</label>
+        <input type="text" id="num_x_id" value="10">
+        <br>
+        <label for="num_y_id">Num Y</label>
+        <input type="text" id="num_y_id" value="15">
+        <br>
+        <label for="difficulty_val">Difficulty</label>
+        <input type="range" min="1" max="10" value="2" step="0.1" class="slider" id="difficulty_val">
+        <br>
+        <button type="button" id="ResetButton">Reset!</button>
+        <br>
+        <button type="button" id='ForceReoad' onclick="document.location.reload(true)">Reload</button>
+        <br>
+        <button type="button" id='Spread_button'>Spread</button>
+        <br>
+        <label for="myOffsetVal">Y Touch Offset</label>
+        <input type="range" min="1" max="100" value="0" class="slider" id="myOffsetVal">
+        <br>
+    
+    <!-- <button type="button" id="ResetButton">Reset!</button> -->
+     <!-- The Modal -->
+     <div id="myModal" class="modal">
         <!-- Modal content -->
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -115,40 +158,7 @@
         }
     </script>
 
-    <script src="dist/phaser.js"></script>
-    <script src="js-colormaps/js-colormaps.js"></script>
-
-    <script src="game.js"></script>
-    <center>
-    <select class="form-control" id="optList" name="selectbasic"></select>
-    <br>
-    <button type="button" id='ForceReoad' onclick="optList.selectedIndex-- ; optList.onchange()"">Prev Cmap</button>
-    <button type="button" id='ForceReoad' onclick="optList.selectedIndex++ ; optList.onchange()">Next Cmap</button>
-    <br>
-    <button type="button" id='ShowMark'>Show Markers</button>
-    <label id="time_id">0 s</label>
-   
-    
-    <div id="thegame"></div>
-    <center>
-        <button type="button" id="ResetButton">Reset!</button>
-        <br>
-        <label for="num_x_id">Num X</label>
-        <input type="text" id="num_x_id" value="10">
-        <br>
-        <label for="num_y_id">Num Y</label>
-        <input type="text" id="num_y_id" value="15">
-        <br>
-        <button type="button" id='ForceReoad' onclick="document.location.reload(true)">Reload</button>
-        <br>
-        <button type="button" id='Spread_button'>Spread</button>
-        <br>
-        <input type="range" min="1" max="100" value="0" class="slider" id="myOffsetVal">
-        <input type="range" min="1" max="10" value="2" step="0.1" class="slider" id="difficulty_val">
-    </center>
-    <!-- <button type="button" id="ResetButton">Reset!</button> -->
-    
-
+</center>
 </body>
 
 </html>
