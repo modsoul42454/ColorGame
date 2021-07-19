@@ -6,8 +6,13 @@ window.onload = function () {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
+<<<<<<< HEAD
             width: Math.round(window.innerWidth),
             height: Math.round(window.innerHeight)-200
+=======
+            width: Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
+            height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
+>>>>>>> 8270f0908410853f444b0fcb8382577e2c16f13a
         },
         physics: {
             default: "arcade",
@@ -44,6 +49,7 @@ var array_text_jj = [];
 var array_text = []
 var isDragging = false
 var rect_container
+var marker_container 
 var total_time = 0
 var last_pointer_down_time
 var game_score 
@@ -157,6 +163,8 @@ function interpolateLinearly(x, values) {
     var r_values = [];
     var g_values = [];
     var b_values = [];
+
+    // for (var i; i< values.length ; i++) {
     for (i in values) {
         x_values.push(values[i][0]);
         r_values.push(values[i][1][0]);
@@ -326,6 +334,8 @@ class playGame extends Phaser.Scene {
         var ResetButton = document.getElementById("ResetButton")
         ResetButton.onclick = this.getConfirmation
         // 
+        var ToggleBUtton = document.getElementById("ShowMark")
+        ToggleBUtton.onclick = this.toggle_markers
 
         var colormaps = ['Blues', 'BuGn', 'BuPu',
             'GnBu', 'Greens', 'Greys', 'Oranges', 'OrRd',
@@ -404,6 +414,10 @@ class playGame extends Phaser.Scene {
         Spread_button.onclick = this.spreadtiles
     }
 
+    toggle_markers(){
+        marker_container.visible = !marker_container.visible
+        marker_container.depth = 1000
+    }
     spreadtiles() {
         this.max_x = init_x + (num_x) * spacer
         this.max_y = init_y + (num_y) * spacer
@@ -438,7 +452,7 @@ class playGame extends Phaser.Scene {
                 var recover_array = JSON.parse(localStorage.getItem('Array'));
                 var recover_colormap = JSON.parse(localStorage.getItem('colormap_val'));
                 total_time = JSON.parse(localStorage.getItem('total_time'));
-
+                time_id_element.text = total_time + 's'
                 for (var ii = 0; ii < num_x; ii++) {
                     for (var jj = 0; jj < num_y; jj++) {
                         array_rects[ii][jj].x = recover_array[ii][jj].x;
@@ -521,10 +535,17 @@ class playGame extends Phaser.Scene {
         localStorage.setItem('num_x', JSON.stringify(num_x));
         localStorage.setItem('num_y', JSON.stringify(num_y));
         rect_container = this.add.container(0, 0)
+<<<<<<< HEAD
         // spacer = Math.floor(Math.min(Math.round(window.innerWidth)/num_x, Math.round(window.innerHeight)/num_y))
         // sq_size = spacer
         // init_x = spacer
         // init_y = spacer
+=======
+        marker_container = this.add.container(0,0)
+        marker_container.depth = 1000
+        marker_container.visible = true
+        // return
+>>>>>>> 8270f0908410853f444b0fcb8382577e2c16f13a
         this.destroy_child_objects('Text')
         this.destroy_child_objects('Rectangle')
         var ColorMap_to_use = this.ColorMap_to_use
@@ -577,6 +598,7 @@ class playGame extends Phaser.Scene {
 
     RandomizeGrid() {
         rect_container.removeAll()
+        marker_container.removeAll()
         this.destroy_child_objects('Text')
         this.destroy_child_objects('Rectangle')
         this.GenerateInitialGrid()
@@ -624,12 +646,16 @@ class playGame extends Phaser.Scene {
                     }
                 }
             }
-        // //console.log(count)
+
+            
+        total_time = 0
+        
         this.destroy_child_objects('Text')
         var color_list = document.getElementById("optList")
 
         color_list.onchange()
-
+        this.compute_score_and_save()
+        marker_container.visible = true
     }
 
     pointer2_down() {
@@ -696,6 +722,7 @@ class playGame extends Phaser.Scene {
                     this.find_and_swap(this.rect1, true)
                     this.rect1.slider_offset_flag = false
                     isDragging = false
+                    this.SaveGame()
                 })
 
 
@@ -719,17 +746,11 @@ class playGame extends Phaser.Scene {
         for (var ii = 0; ii < num_x; ii++)
             for (var jj = 0; jj < num_y; jj++) {
                 {
-
-                    array_rects_to_save[ii][jj].x = array_rects[ii][jj].x
-                    array_rects_to_save[ii][jj].y = array_rects[ii][jj].y
-
-                    array_rects_to_save[ii][jj].orig_pos_x = array_rects[ii][jj].orig_pos_x
-                    array_rects_to_save[ii][jj].orig_pos_y = array_rects[ii][jj].orig_pos_y
-
                     if (array_rects[ii][jj] != rect_in & equals(array_rects[ii][jj].x, new_x) & equals(array_rects[ii][jj].y, new_y)) {
                         var intersected_array = array_rects[ii][jj]
                         sub_found = true
-
+                        break
+                        
                     }
                 }
             }
@@ -825,11 +846,12 @@ class playGame extends Phaser.Scene {
                         correct_num++;
                     }
 
-
+                    
                     if (distance == 0 && array_rects[ii][jj].flag_interactive && isDragging == false) {
                         var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'o', { color: rgbToHex(0, 0, 0) })
                         rect_container.add(text)
                         rect_container.depth = 1
+                        marker_container.add(text)
                         text.depth = 1000
                         array_rects[ii][jj].disableInteractive();
                         array_rects[ii][jj].flag_interactive = false
@@ -860,7 +882,11 @@ class playGame extends Phaser.Scene {
         if (this.frameTime > 1000) {
             // this.compute_score_and_save()
             this.frameTime = 0
+<<<<<<< HEAD
             time_id_element.innerText = (total_time/1000).toFixed(2) + ' s'
+=======
+                time_id_element.innerText = (total_time/1000).toFixed(2) + ' s'
+>>>>>>> 8270f0908410853f444b0fcb8382577e2c16f13a
 
         }
 
