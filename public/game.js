@@ -6,8 +6,8 @@ window.onload = function () {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
-            width: Math.round(window.innerWidth),
-            height: Math.round(window.innerHeight)
+            width: Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
+            height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
         },
         physics: {
             default: "arcade",
