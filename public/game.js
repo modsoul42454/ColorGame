@@ -6,13 +6,8 @@ window.onload = function () {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
-<<<<<<< HEAD
-            width: Math.round(window.innerWidth),
-            height: Math.round(window.innerHeight)-200
-=======
             width: Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
             height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
->>>>>>> 8270f0908410853f444b0fcb8382577e2c16f13a
         },
         physics: {
             default: "arcade",
@@ -535,17 +530,10 @@ class playGame extends Phaser.Scene {
         localStorage.setItem('num_x', JSON.stringify(num_x));
         localStorage.setItem('num_y', JSON.stringify(num_y));
         rect_container = this.add.container(0, 0)
-<<<<<<< HEAD
-        // spacer = Math.floor(Math.min(Math.round(window.innerWidth)/num_x, Math.round(window.innerHeight)/num_y))
-        // sq_size = spacer
-        // init_x = spacer
-        // init_y = spacer
-=======
         marker_container = this.add.container(0,0)
         marker_container.depth = 1000
         marker_container.visible = true
         // return
->>>>>>> 8270f0908410853f444b0fcb8382577e2c16f13a
         this.destroy_child_objects('Text')
         this.destroy_child_objects('Rectangle')
         var ColorMap_to_use = this.ColorMap_to_use
@@ -882,11 +870,7 @@ class playGame extends Phaser.Scene {
         if (this.frameTime > 1000) {
             // this.compute_score_and_save()
             this.frameTime = 0
-<<<<<<< HEAD
-            time_id_element.innerText = (total_time/1000).toFixed(2) + ' s'
-=======
                 time_id_element.innerText = (total_time/1000).toFixed(2) + ' s'
->>>>>>> 8270f0908410853f444b0fcb8382577e2c16f13a
 
         }
 
