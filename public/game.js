@@ -287,7 +287,8 @@ class playGame extends Phaser.Scene {
         }
     }
     create() {
-
+        var database = firebase.database()
+        
         time_id_element = document.getElementById('time_id')
         this.post_randomization_clean_up_cycles = 0
         playGame_class_var = this
@@ -582,7 +583,7 @@ class playGame extends Phaser.Scene {
             }
         }
 
-        if (isLandscape){
+        if (isLandscape()){
             rect_container.rotation = Math.PI / 2
             rect_container.x = (init_x + num_x * spacer) * 2
             marker_container.rotation = rect_container.rotation
@@ -874,7 +875,8 @@ class playGame extends Phaser.Scene {
             total_time +=delta
            
         }
-        // if (isLandscape){
+
+        // if (isLandscape()){
         //     // width: Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
         //     // height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
         //     this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
@@ -894,7 +896,7 @@ class playGame extends Phaser.Scene {
         if (this.frameTime > 1000) {
             // this.compute_score_and_save()
             this.frameTime = 0
-                time_id_element.innerText = (total_time/1000).toFixed(2) + ' s'
+                time_id_element.innerText = (total_time/1000).toFixed(0) + ' s'
 
         }
 
