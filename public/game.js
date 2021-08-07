@@ -6,8 +6,8 @@ window.onload = function () {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
-            width: Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
-            height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
+            width: Math.round(window.innerWidth) - Math.round(window.innerWidth) * .2,
+            height: Math.round(window.innerHeight) - 10//- Math.round(window.innerHeight)*0.2
         },
         physics: {
             default: "arcade",
@@ -44,13 +44,16 @@ var array_text_jj = [];
 var array_text = []
 var isDragging = false
 var rect_container
-var marker_container 
+var marker_container
 var total_time = 0
 var last_pointer_down_time
-var game_score 
+var game_score
 var correct_num = 0;
 var distance_orig = 0
+var move_history_array_xOrig_yOrig_xOld_yOld = []
+
 var time_id_element = document.getElementById('time_id')
+var replay_count = -1
 function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -132,7 +135,7 @@ class Hud extends Phaser.Scene {
         info.setBackgroundColor('White')
         //  Grab a reference to the Game Scene
         let ourGame = this.scene.get('PlayGame');
-
+        this.info = info
         //  Listen for events from it
         ourGame.events.on('addScore', function ({ str_score, direction }) {
 
@@ -288,7 +291,7 @@ class playGame extends Phaser.Scene {
     }
     create() {
         var database = firebase.database()
-        
+
         time_id_element = document.getElementById('time_id')
         this.post_randomization_clean_up_cycles = 0
         playGame_class_var = this
@@ -329,6 +332,10 @@ class playGame extends Phaser.Scene {
 
         var ResetButton = document.getElementById("ResetButton")
         ResetButton.onclick = this.getConfirmation
+
+        var replay_button = document.getElementById("Replay_button")
+        replay_button.onclick = this.Replay
+
         // 
         var ToggleBUtton = document.getElementById("ShowMark")
         ToggleBUtton.onclick = this.toggle_markers
@@ -391,7 +398,7 @@ class playGame extends Phaser.Scene {
             Num_x_input.value = JSON.parse(localStorage.getItem('num_x'));
             Num_y_input.value = JSON.parse(localStorage.getItem('num_y'));
         }
-        
+
         this.GenerateInitialGrid();
 
         this.input.on('pointerdown', this.PointerDown, this)
@@ -408,9 +415,59 @@ class playGame extends Phaser.Scene {
 
         var Spread_button = document.getElementById("Spread_button")
         Spread_button.onclick = this.spreadtiles
+
     }
 
-    toggle_markers(){
+    Replay() {
+        replay_count = move_history_array_xOrig_yOrig_xOld_yOld.length - 1
+        marker_container.visible = false
+        for (var ii = 0; ii < num_x; ii++) {
+            for (var jj = 0; jj < num_y; jj++) {
+                array_rects[ii][jj].x = array_rects[ii][jj].orig_random_xy[0]
+
+                array_rects[ii][jj].y = array_rects[ii][jj].orig_random_xy[1]
+
+
+            }
+        }
+    }
+
+    do_replay() {
+        //return
+        // move_history_array
+        console.log('Doing Replay')
+        move_history_array_xOrig_yOrig_xOld_yOld
+        var move_xOrig_yOrig_xNew_yNew = move_history_array_xOrig_yOrig_xOld_yOld[
+            move_history_array_xOrig_yOrig_xOld_yOld.length - replay_count - 1]
+
+
+
+        for (var ii = 0; ii < num_x; ii++) {
+            for (var jj = 0; jj < num_y; jj++) {
+                if (equals(array_rects[ii][jj].orig_pos_x, move_xOrig_yOrig_xNew_yNew[0])
+                    & equals(array_rects[ii][jj].orig_pos_y, move_xOrig_yOrig_xNew_yNew[1])) {
+                    var rect_to_move = array_rects[ii][jj]
+                    // rect_to_move.setInteractive()
+                    rect_to_move.x = move_xOrig_yOrig_xNew_yNew[2]
+                    rect_to_move.y = move_xOrig_yOrig_xNew_yNew[3]
+                    let Hud_scene = game.scene.getScenes()[1];
+                    Hud_scene.info.setText(`Replaying Rewinding Moves, ${replay_count}`)
+                    replay_count--
+
+                    if (replay_count == -1) {
+                        this.ReloadData()
+                        marker_container.visible = true
+                        
+                    }
+                    return
+
+                }
+            }
+        }
+
+
+    }
+    toggle_markers() {
         marker_container.visible = !marker_container.visible
         marker_container.depth = 1000
     }
@@ -447,6 +504,11 @@ class playGame extends Phaser.Scene {
 
                 var recover_array = JSON.parse(localStorage.getItem('Array'));
                 var recover_colormap = JSON.parse(localStorage.getItem('colormap_val'));
+                move_history_array_xOrig_yOrig_xOld_yOld = JSON.parse(localStorage.getItem('move_history_array_xOld_yOld_xNew_yNew'))
+
+                if (move_history_array_xOrig_yOrig_xOld_yOld == null) {
+                    move_history_array_xOrig_yOrig_xOld_yOld = []
+                }
                 total_time = JSON.parse(localStorage.getItem('total_time'));
                 time_id_element.text = total_time + 's'
                 for (var ii = 0; ii < num_x; ii++) {
@@ -457,6 +519,7 @@ class playGame extends Phaser.Scene {
                         array_rects[ii][jj].last_pos_y = array_rects[ii][jj].y;
                         array_rects[ii][jj].setInteractive({ draggable: true });
                         array_rects[ii][jj].flag_interactive = true;
+                        array_rects[ii][jj].orig_random_xy = recover_array[ii][jj].orig_random_xy
                         arrays_xy[count] = [array_rects[ii][jj].x, recover_array[ii][jj].y]
                         count++
 
@@ -531,7 +594,7 @@ class playGame extends Phaser.Scene {
         localStorage.setItem('num_x', JSON.stringify(num_x));
         localStorage.setItem('num_y', JSON.stringify(num_y));
         rect_container = this.add.container(0, 0)
-        marker_container = this.add.container(0,0)
+        marker_container = this.add.container(0, 0)
         marker_container.depth = 1000
         marker_container.visible = true
         // return
@@ -541,7 +604,7 @@ class playGame extends Phaser.Scene {
         var count = 0
         array_rects = createArray(num_x, num_y)
         array_rects_to_save = createArray(num_x, num_y)
-        
+
 
         this.max_x = init_x + (num_x) * spacer
         this.max_y = init_y + (num_y) * spacer
@@ -564,6 +627,7 @@ class playGame extends Phaser.Scene {
 
                 array_rects[ii][jj].orig_pos_x = array_rects[ii][jj].x;
                 array_rects[ii][jj].orig_pos_y = array_rects[ii][jj].y;
+                array_rects[ii][jj].orig_random_xy = [0, 0]
                 array_rects[ii][jj].flag_interactive = true
                 array_rects[ii][jj].setInteractive({ draggable: true });
 
@@ -583,7 +647,7 @@ class playGame extends Phaser.Scene {
             }
         }
 
-        if (isLandscape()){
+        if (isLandscape()) {
             rect_container.rotation = Math.PI / 2
             rect_container.x = (init_x + num_x * spacer) * 2
             marker_container.rotation = rect_container.rotation
@@ -614,6 +678,15 @@ class playGame extends Phaser.Scene {
                 }
             }
 
+        // incomplete
+        var range_array_x = tf.range(0, num_x * num_y)
+        var range_array_y = tf.range(0, num_x * num_y)
+        var grid_array_x = range_array_x.arraySync()
+        var grid_array_y = range_array_y.arraySync()
+        tf.util.shuffle(grid_array_y)
+        tf.util.shuffle(grid_array_x)
+
+
         //console.log({ difficulty_ratio })
         for (var ii = 0; ii < num_x; ii++)
             for (var jj = 0; jj < num_y; jj++) {
@@ -626,10 +699,10 @@ class playGame extends Phaser.Scene {
                         array_rects[ii][jj].x = init_x + Math.random() * (num_x - 1) * (spacer);
                         array_rects[ii][jj].y = init_y + Math.random() * (num_y - 1) * (spacer);
                         this.find_and_swap(array_rects[ii][jj], false);
+                        array_rects[ii][jj].orig_random_xy = [array_rects[ii][jj].x, array_rects[ii][jj].y]
                         array_rects[ii][jj].last_pos_x = array_rects[ii][jj].x;
                         array_rects[ii][jj].last_pos_y = array_rects[ii][jj].y;
                         array_rects[ii][jj].visible = true
-
                         array_rects_to_save[ii][jj] = new Object()
                         array_rects_to_save[ii][jj].x = array_rects[ii][jj].x
                         array_rects_to_save[ii][jj].y = array_rects[ii][jj].y
@@ -639,14 +712,25 @@ class playGame extends Phaser.Scene {
 
                     }
                     else {
-
+                        array_rects[ii][jj].orig_random_xy = [array_rects[ii][jj].x, array_rects[ii][jj].y]
                     }
+                    array_rects_to_save[ii][jj].orig_random_xy = array_rects[ii][jj].orig_random_xy
+
                 }
+
             }
 
-            
+        for (var ii = 0; ii < num_x; ii++) {
+            for (var jj = 0; jj < num_y; jj++) {
+                array_rects[ii][jj].orig_random_xy = [array_rects[ii][jj].x, array_rects[ii][jj].y]
+                array_rects_to_save[ii][jj].orig_random_xy = array_rects[ii][jj].orig_random_xy
+            }
+        }
+
+        move_history_array_xOrig_yOrig_xOld_yOld = []
+        this.SaveGame()
         total_time = 0
-        
+
         this.destroy_child_objects('Text')
         var color_list = document.getElementById("optList")
 
@@ -660,7 +744,7 @@ class playGame extends Phaser.Scene {
     }
     PointerDown(pointer, targets) {
         last_pointer_down_time = Date.now()
-        
+
         // //console.log('isPinched' + this.dragScale.isPinched)
         if (this.input.pointer1.active && !this.input.pointer2.active && !this.dragScale.isPinched) {
             if (targets[0] != null) {
@@ -673,7 +757,7 @@ class playGame extends Phaser.Scene {
                 this.rect1.on('dragstart', (pointer, dragX, dragY) => {
                     this.slider_offset_flag = false
                     isDragging = true
-                   
+
 
                 })
                 this.rect1.on('drag', (pointer, dragX, dragY) => {
@@ -681,7 +765,7 @@ class playGame extends Phaser.Scene {
                         // //console.log('Draggin')
                         this.rect1.x = dragX
                         var yoffset = 0
-                        if (isDragging == false){
+                        if (isDragging == false) {
                             distance_orig = Math.sqrt((this.rect1.x - this.rect1.orig_pos_x) ** 2 + (this.rect1.y - this.rect1.orig_pos_y) ** 2);
                             //console.log({distance_orig})
                         }
@@ -702,7 +786,7 @@ class playGame extends Phaser.Scene {
 
                         var ddistance = distance_orig - (Math.sqrt((this.rect1.x - this.rect1.orig_pos_x) ** 2 + (this.rect1.y - this.rect1.orig_pos_y) ** 2))
                         ddistance = ddistance / spacer
-                        
+
                         //console.log({ddistance,distance_orig})
 
                         var str_score = correct_num + '/' + num_x * num_y + ', ' + (game_score + ddistance).toFixed(2);
@@ -740,36 +824,49 @@ class playGame extends Phaser.Scene {
 
 
 
-        for (var ii = 0; ii < num_x; ii++)
+        for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
-                {
-                    if (array_rects[ii][jj] != rect_in & equals(array_rects[ii][jj].x, new_x) & equals(array_rects[ii][jj].y, new_y)) {
-                        var intersected_array = array_rects[ii][jj]
-                        sub_found = true
-                        break
-                        
-                    }
+                if (array_rects[ii][jj] != rect_in & equals(array_rects[ii][jj].x, new_x) & equals(array_rects[ii][jj].y, new_y)) {
+                    var intersected_array = array_rects[ii][jj]
+                    sub_found = true
+                    break
+
                 }
             }
+        }
 
 
         if (sub_found && intersected_array.flag_interactive) {
+
             intersected_array.x = rect_in.last_pos_x
             intersected_array.y = rect_in.last_pos_y
+            this.AddToMoveHistory(intersected_array);
+
+
 
             intersected_array.last_pos_x = intersected_array.x
             intersected_array.last_pos_y = intersected_array.y
 
+
+
+        
+
             rect_in.x = Math.round(rect_in.x / spacer) * spacer
             rect_in.y = Math.round(rect_in.y / spacer) * spacer
-
+            this.AddToMoveHistory(rect_in);
+            
             rect_in.last_pos_x = rect_in.x
             rect_in.last_pos_y = rect_in.y
 
         }
         else if (!sub_found) {
+            var move_log1 = []
+            
             rect_in.x = Math.round(rect_in.x / spacer) * spacer
             rect_in.y = Math.round(rect_in.y / spacer) * spacer
+            this.AddToMoveHistory(rect_in);
+            
+
 
             rect_in.last_pos_x = rect_in.x
             rect_in.last_pos_y = rect_in.y
@@ -779,11 +876,13 @@ class playGame extends Phaser.Scene {
 
 
             if (rect_in.x > init_x + num_x * spacer || rect_in.y > init_y + num_y * spacer) {
+            
+
                 rect_in.x = Math.round(rect_in.x / spacer) * spacer
                 rect_in.y = Math.round(rect_in.y / spacer) * spacer
-
                 rect_in.last_pos_x = rect_in.x
                 rect_in.last_pos_y = rect_in.y
+                this.AddToMoveHistory(rect_in);
             }
             else {
                 rect_in.x = rect_in.last_pos_x
@@ -791,6 +890,7 @@ class playGame extends Phaser.Scene {
 
                 rect_in.last_pos_x = rect_in.x
                 rect_in.last_pos_y = rect_in.y
+                this.AddToMoveHistory(rect_in);
             }
 
 
@@ -800,6 +900,16 @@ class playGame extends Phaser.Scene {
 
 
         }
+    }
+
+    AddToMoveHistory(intersected_array) {
+        var move_log1 = [];
+        move_log1[0] = intersected_array.orig_pos_x;
+        move_log1[1] = intersected_array.orig_pos_y;
+        move_log1[2] = intersected_array.x;
+        move_log1[3] = intersected_array.y;
+        move_history_array_xOrig_yOrig_xOld_yOld.push(move_log1);
+     
     }
 
     SaveGame() {
@@ -812,21 +922,24 @@ class playGame extends Phaser.Scene {
 
                 array_rects_to_save[ii][jj].orig_pos_x = array_rects[ii][jj].orig_pos_x
                 array_rects_to_save[ii][jj].orig_pos_y = array_rects[ii][jj].orig_pos_y
+
+                array_rects_to_save[ii][jj].orig_random_xy = array_rects[ii][jj].orig_random_xy
             }
         }
         var string_data = JSON.stringify(array_rects_to_save);
         localStorage.setItem('Array', string_data);
         var color_list = document.getElementById("optList");
         localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
-        localStorage.setItem('total_time',JSON.stringify(total_time));
+        localStorage.setItem('total_time', JSON.stringify(total_time));
         var Num_x_input = document.getElementById("num_x_id")
         var Num_y_input = document.getElementById("num_y_id")
         num_x = parseInt(Num_x_input.value)
         num_y = parseInt(Num_y_input.value)
         localStorage.setItem('num_x', JSON.stringify(num_x));
         localStorage.setItem('num_y', JSON.stringify(num_y));
+        localStorage.setItem('move_history_array_xOld_yOld_xNew_yNew', JSON.stringify(move_history_array_xOrig_yOrig_xOld_yOld))
 
-        
+
     }
 
     compute_score_and_save() {
@@ -843,7 +956,7 @@ class playGame extends Phaser.Scene {
                         correct_num++;
                     }
 
-                    
+
                     if (distance == 0 && array_rects[ii][jj].flag_interactive && isDragging == false) {
                         var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'o', { color: rgbToHex(0, 0, 0) })
                         rect_container.add(text)
@@ -870,10 +983,10 @@ class playGame extends Phaser.Scene {
 
     update(time, delta) {
         this.frameTime += delta
-        if ( (Date.now() - last_pointer_down_time)/1000<10  ){
-            
-            total_time +=delta
-           
+        if ((Date.now() - last_pointer_down_time) / 1000 < 10) {
+
+            total_time += delta
+
         }
 
         // if (isLandscape()){
@@ -893,12 +1006,16 @@ class playGame extends Phaser.Scene {
         //     marker_container.rotation = rect_container.rotation
         //     marker_container.x = rect_container.x 
         // }
-        if (this.frameTime > 1000) {
+        if (this.frameTime > 200) {
             // this.compute_score_and_save()
             this.frameTime = 0
-                time_id_element.innerText = (total_time/1000).toFixed(0) + ' s'
+            time_id_element.innerText = (total_time / 1000).toFixed(0) + ' s'
+            if (replay_count > -1) {
+                this.do_replay()
 
+            }
         }
+
 
 
 
