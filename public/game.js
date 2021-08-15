@@ -121,7 +121,7 @@ function shuffle(array) {
 
     return array;
 }
-
+let ourGame
 class Hud extends Phaser.Scene {
     constructor() {
         super({ key: 'UIScene', active: true });
@@ -134,7 +134,7 @@ class Hud extends Phaser.Scene {
         info.setFill('black')
         info.setBackgroundColor('White')
         //  Grab a reference to the Game Scene
-        let ourGame = this.scene.get('PlayGame');
+        ourGame = this.scene.get('PlayGame');
         this.info = info
         //  Listen for events from it
         ourGame.events.on('addScore', function ({ str_score, direction }) {
@@ -267,8 +267,10 @@ class playGame extends Phaser.Scene {
         }
 
 
-        localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
-
+        // localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
+        if (ourGame.GameStartTime != null){
+            ourGame.SaveGame()
+        }
 
     }
 
@@ -288,6 +290,24 @@ class playGame extends Phaser.Scene {
             playGame_class_var.post_randomization_clean_up_cycles = 30
             return true;
         }
+    }
+
+
+    setSave()
+    {
+        var select_saves = document.getElementById("Select_Saves")
+        var save_keys = Object.keys(localStorage)
+        while (select_saves.options.length > 0) {
+            select_saves.remove(0);
+        }
+        for (var save_key in save_keys){
+            if ( save_keys[save_key].includes("Time") ){
+                var opt = document.createElement('option');
+                opt.value = save_keys[save_key];
+                opt.innerHTML = save_keys[save_key];
+                select_saves.appendChild(opt)}
+        }
+        select_saves.onchange = this.ReloadData
     }
     create() {
         var database = firebase.database()
@@ -403,7 +423,8 @@ class playGame extends Phaser.Scene {
 
         this.input.on('pointerdown', this.PointerDown, this)
         // this.input.on('pointer2down', this.pointer2_down, this)
-        this.ReloadData();
+        
+        
         this.change_color();
         // var count;
         // var ii;
@@ -415,6 +436,11 @@ class playGame extends Phaser.Scene {
 
         var Spread_button = document.getElementById("Spread_button")
         Spread_button.onclick = this.spreadtiles
+
+        this.setSave()
+        var select_saves = document.getElementById("Select_Saves")
+        select_saves.selectedIndex = 0
+        this.ReloadData();
 
     }
 
@@ -486,8 +512,21 @@ class playGame extends Phaser.Scene {
     }
 
     ReloadData() {
-        var recover_array = JSON.parse(localStorage.getItem('Array'));
-        if (recover_array == null) {
+
+        var select_saves = document.getElementById("Select_Saves")
+        var save_keys = Object.keys(localStorage)
+        if (select_saves.selectedIndex == -1){
+            select_saves.selectedIndex = 0
+            reload_data = false
+            // return
+        }
+        else
+        {
+            var save_data = JSON.parse(localStorage.getItem(select_saves[select_saves.selectedIndex].value))
+        
+        }
+        // var recover_array = JSON.parse(localStorage.getItem('Array'));
+        if (save_data == null) {
             reload_data = false;
         }
 
@@ -496,21 +535,27 @@ class playGame extends Phaser.Scene {
         var count = 0
         try {
             if (reload_data) {
-
                 var Num_x_input = document.getElementById("num_x_id")
                 var Num_y_input = document.getElementById("num_y_id")
-                Num_x_input.value = JSON.parse(localStorage.getItem('num_x'));
-                Num_y_input.value = JSON.parse(localStorage.getItem('num_y'));
+                Num_x_input.value = save_data.num_x;
+                Num_y_input.value = save_data.num_y
+                rect_container.removeAll()
+                marker_container.removeAll()
+                this.destroy_child_objects('Text')
+                this.destroy_child_objects('Rectangle')
+                this.GenerateInitialGrid()
 
-                var recover_array = JSON.parse(localStorage.getItem('Array'));
-                var recover_colormap = JSON.parse(localStorage.getItem('colormap_val'));
-                move_history_array_xOrig_yOrig_xOld_yOld = JSON.parse(localStorage.getItem('move_history_array_xOld_yOld_xNew_yNew'))
+                var recover_array =  save_data.Array
+                var recover_colormap = save_data.colormap_val
+                move_history_array_xOrig_yOrig_xOld_yOld = save_data.move_history_array_xOld_yOld_xNew_yNew
 
                 if (move_history_array_xOrig_yOrig_xOld_yOld == null) {
                     move_history_array_xOrig_yOrig_xOld_yOld = []
                 }
-                total_time = JSON.parse(localStorage.getItem('total_time'));
+                total_time = save_data.total_time
                 time_id_element.text = total_time + 's'
+
+                this.GameStartTime = Date(save_data.GameStartTime)
                 for (var ii = 0; ii < num_x; ii++) {
                     for (var jj = 0; jj < num_y; jj++) {
                         array_rects[ii][jj].x = recover_array[ii][jj].x;
@@ -591,8 +636,8 @@ class playGame extends Phaser.Scene {
         var Num_y_input = document.getElementById("num_y_id")
         num_x = parseInt(Num_x_input.value)
         num_y = parseInt(Num_y_input.value)
-        localStorage.setItem('num_x', JSON.stringify(num_x));
-        localStorage.setItem('num_y', JSON.stringify(num_y));
+        // localStorage.setItem('num_x', JSON.stringify(num_x));
+        // localStorage.setItem('num_y', JSON.stringify(num_y));
         rect_container = this.add.container(0, 0)
         marker_container = this.add.container(0, 0)
         marker_container.depth = 1000
@@ -666,7 +711,7 @@ class playGame extends Phaser.Scene {
         var count = 0;
         this.array_text = [];
 
-
+        this.GameStartTime = new Date()
         var difficulty_val = document.getElementById("difficulty_val")
         var difficulty_ratio = Math.log10(parseInt(difficulty_val.value))
 
@@ -737,6 +782,7 @@ class playGame extends Phaser.Scene {
         color_list.onchange()
         this.compute_score_and_save()
         marker_container.visible = true
+        this.setSave()
     }
 
     pointer2_down() {
@@ -926,18 +972,34 @@ class playGame extends Phaser.Scene {
                 array_rects_to_save[ii][jj].orig_random_xy = array_rects[ii][jj].orig_random_xy
             }
         }
-        var string_data = JSON.stringify(array_rects_to_save);
-        localStorage.setItem('Array', string_data);
+        var save_data = {}
+
+
+        
+
+        
+        save_data.Array = array_rects_to_save
+        // localStorage.setItem('Array', string_data);
+        
         var color_list = document.getElementById("optList");
-        localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
-        localStorage.setItem('total_time', JSON.stringify(total_time));
+        
+        save_data.colormap_val = color_list.selectedIndex
+        save_data.total_time = total_time
+        // localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
+        // localStorage.setItem('total_time', JSON.stringify(total_time));
         var Num_x_input = document.getElementById("num_x_id")
         var Num_y_input = document.getElementById("num_y_id")
         num_x = parseInt(Num_x_input.value)
         num_y = parseInt(Num_y_input.value)
-        localStorage.setItem('num_x', JSON.stringify(num_x));
-        localStorage.setItem('num_y', JSON.stringify(num_y));
-        localStorage.setItem('move_history_array_xOld_yOld_xNew_yNew', JSON.stringify(move_history_array_xOrig_yOrig_xOld_yOld))
+
+        save_data.num_x = num_x
+        save_data.num_y = num_y
+        save_data.move_history_array_xOld_yOld_xNew_yNew = move_history_array_xOrig_yOrig_xOld_yOld
+        // localStorage.setItem('num_x', JSON.stringify(num_x));
+        // localStorage.setItem('num_y', JSON.stringify(num_y));
+        // localStorage.setItem('move_history_array_xOld_yOld_xNew_yNew', JSON.stringify(move_history_array_xOrig_yOrig_xOld_yOld))
+        save_data.GameStartTime = this.GameStartTime
+        localStorage.setItem(this.GameStartTime,JSON.stringify(save_data))
 
 
     }
