@@ -1076,14 +1076,14 @@ class playGame extends Phaser.Scene {
         //     marker_container.rotation = rect_container.rotation
         //     marker_container.x = rect_container.x 
         // }
-        if (this.frameTime > 200) {
+        if (this.frameTime > 1000) {
             // this.compute_score_and_save()
             this.frameTime = 0
             time_id_element.innerText = (total_time / 1000).toFixed(0) + ' s'
-            if (replay_count > -1) {
-                this.do_replay()
+            // if (replay_count > -1) {
+            //     this.do_replay()
 
-            }
+            // }
         }
 
 
