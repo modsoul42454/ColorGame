@@ -7,7 +7,7 @@ window.onload = function () {
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
             width: Math.round(window.innerWidth) - Math.round(window.innerWidth) * .2,
-            height: Math.round(window.innerHeight) - 10//- Math.round(window.innerHeight)*0.2
+            height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
         },
         physics: {
             default: "arcade",
@@ -54,6 +54,11 @@ var move_history_array_xOrig_yOrig_xOld_yOld = []
 
 var time_id_element = document.getElementById('time_id')
 var replay_count = -1
+
+function change_save(){
+    ourGame.ReloadData()
+}
+
 function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -307,7 +312,7 @@ class playGame extends Phaser.Scene {
                 opt.innerHTML = save_keys[save_key];
                 select_saves.appendChild(opt)}
         }
-        select_saves.onchange = this.ReloadData
+        select_saves.onchange = change_save
     }
     create() {
         var database = firebase.database()
@@ -512,7 +517,7 @@ class playGame extends Phaser.Scene {
     }
 
     ReloadData() {
-
+        reload_data = true
         var select_saves = document.getElementById("Select_Saves")
         var save_keys = Object.keys(localStorage)
         if (select_saves.selectedIndex == -1){
@@ -555,7 +560,7 @@ class playGame extends Phaser.Scene {
                 total_time = save_data.total_time
                 time_id_element.text = total_time + 's'
 
-                this.GameStartTime = Date(save_data.GameStartTime)
+                this.GameStartTime = new Date(Date.parse(save_data.GameStartTime))
                 for (var ii = 0; ii < num_x; ii++) {
                     for (var jj = 0; jj < num_y; jj++) {
                         array_rects[ii][jj].x = recover_array[ii][jj].x;
@@ -773,16 +778,16 @@ class playGame extends Phaser.Scene {
         }
 
         move_history_array_xOrig_yOrig_xOld_yOld = []
-        this.SaveGame()
         total_time = 0
-
+        
         this.destroy_child_objects('Text')
         var color_list = document.getElementById("optList")
-
+        
         color_list.onchange()
         this.compute_score_and_save()
         marker_container.visible = true
         this.setSave()
+        // this.SaveGame()
     }
 
     pointer2_down() {
@@ -959,6 +964,9 @@ class playGame extends Phaser.Scene {
     }
 
     SaveGame() {
+        if (this.GameStartTime == null){
+            return
+        }
         this.compute_score_and_save();
         for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
