@@ -50,7 +50,7 @@ var last_pointer_down_time
 var game_score
 var correct_num = 0;
 var distance_orig = 0
-var move_history_array_xOrig_yOrig_xOld_yOld = []
+// var move_history_array_xOrig_yOrig_xOld_yOld = []
 
 var time_id_element = document.getElementById('time_id')
 var replay_count = -1
@@ -450,7 +450,7 @@ class playGame extends Phaser.Scene {
     }
 
     Replay() {
-        replay_count = move_history_array_xOrig_yOrig_xOld_yOld.length - 1
+        // replay_count = move_history_array_xOrig_yOrig_xOld_yOld.length - 1
         marker_container.visible = false
         for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
@@ -467,9 +467,9 @@ class playGame extends Phaser.Scene {
         //return
         // move_history_array
         console.log('Doing Replay')
-        move_history_array_xOrig_yOrig_xOld_yOld
-        var move_xOrig_yOrig_xNew_yNew = move_history_array_xOrig_yOrig_xOld_yOld[
-            move_history_array_xOrig_yOrig_xOld_yOld.length - replay_count - 1]
+        // move_history_array_xOrig_yOrig_xOld_yOld
+        // var move_xOrig_yOrig_xNew_yNew = move_history_array_xOrig_yOrig_xOld_yOld[
+            // move_history_array_xOrig_yOrig_xOld_yOld.length - replay_count - 1]
 
 
 
@@ -552,11 +552,11 @@ class playGame extends Phaser.Scene {
 
                 var recover_array =  save_data.Array
                 var recover_colormap = save_data.colormap_val
-                move_history_array_xOrig_yOrig_xOld_yOld = save_data.move_history_array_xOld_yOld_xNew_yNew
+                // move_history_array_xOrig_yOrig_xOld_yOld = save_data.move_history_array_xOld_yOld_xNew_yNew
 
-                if (move_history_array_xOrig_yOrig_xOld_yOld == null) {
-                    move_history_array_xOrig_yOrig_xOld_yOld = []
-                }
+                // if (move_history_array_xOrig_yOrig_xOld_yOld == null) {
+                //     move_history_array_xOrig_yOrig_xOld_yOld = []
+                // }
                 total_time = save_data.total_time
                 time_id_element.text = total_time + 's'
 
@@ -777,7 +777,7 @@ class playGame extends Phaser.Scene {
             }
         }
 
-        move_history_array_xOrig_yOrig_xOld_yOld = []
+        // move_history_array_xOrig_yOrig_xOld_yOld = []
         total_time = 0
         
         this.destroy_child_objects('Text')
@@ -959,7 +959,7 @@ class playGame extends Phaser.Scene {
         move_log1[1] = intersected_array.orig_pos_y;
         move_log1[2] = intersected_array.x;
         move_log1[3] = intersected_array.y;
-        move_history_array_xOrig_yOrig_xOld_yOld.push(move_log1);
+        // move_history_array_xOrig_yOrig_xOld_yOld.push(move_log1);
      
     }
 
@@ -1002,7 +1002,7 @@ class playGame extends Phaser.Scene {
 
         save_data.num_x = num_x
         save_data.num_y = num_y
-        save_data.move_history_array_xOld_yOld_xNew_yNew = move_history_array_xOrig_yOrig_xOld_yOld
+        // save_data.move_history_array_xOld_yOld_xNew_yNew = move_history_array_xOrig_yOrig_xOld_yOld
         // localStorage.setItem('num_x', JSON.stringify(num_x));
         // localStorage.setItem('num_y', JSON.stringify(num_y));
         // localStorage.setItem('move_history_array_xOld_yOld_xNew_yNew', JSON.stringify(move_history_array_xOrig_yOrig_xOld_yOld))
