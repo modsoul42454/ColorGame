@@ -3,7 +3,7 @@ window.onload = function () {
         type: Phaser.AUTO,
         backgroundColor: '#000000',
         scale: {
-            mode: Phaser.Scale.NONE,
+            mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
             width: Math.round(window.innerWidth) - Math.round(window.innerWidth) * .1,
@@ -133,13 +133,38 @@ class Hud extends Phaser.Scene {
 
         this.score = 0;
     }
+
+    change_color(dir){
+        document.getElementById("optList").selectedIndex += dir
+        document.getElementById("optList").selectedIndex = Math.max( document.getElementById("optList").selectedIndex,0  )
+        // document.getElementById("optList").selectedIndex = Math.max( document.getElementById("optList").Item,0  )
+        document.getElementById("optList").onchange()
+    }
+
     create() {
         //  Our Text object to display the Score
         let info = this.add.text(10, 10, 'Score: 0', { font: '36px Arial' });
+
+        let next_color = this.add.text(10, 50, 'Next Color', { font: '36px Arial' });
+        next_color.setInteractive()
+        next_color.setBackgroundColor('White')
+        next_color.setFill('black')
+        
+        let prev_color = this.add.text(250, 50, 'Prev Color', { font: '36px Arial' });
+        prev_color.setBackgroundColor('White')
+        prev_color.setFill('black')
+        prev_color.setInteractive()
+
+
+        next_color.on('pointerdown', () => this.change_color(1) )
+        prev_color.on('pointerdown', () => this.change_color(-1) )
+
         info.setFill('black')
         info.setBackgroundColor('White')
         //  Grab a reference to the Game Scene
         ourGame = this.scene.get('PlayGame');
+        ourGame.next_color = next_color
+        ourGame.prev_color = prev_color
         this.info = info
         //  Listen for events from it
         ourGame.events.on('addScore', function ({ str_score, direction }) {
@@ -315,7 +340,7 @@ class playGame extends Phaser.Scene {
         select_saves.onchange = change_save
     }
     create() {
-        var database = firebase.database()
+        // var database = firebase.database()
 
         time_id_element = document.getElementById('time_id')
         this.post_randomization_clean_up_cycles = 0
@@ -357,8 +382,9 @@ class playGame extends Phaser.Scene {
 
         var ResetButton = document.getElementById("ResetButton")
         ResetButton.onclick = this.getConfirmation
-
-        var replay_button = document.getElementById("Replay_button")
+        
+   
+        var replay_button = document.getElementById("NextColor")
         replay_button.onclick = this.Replay
 
         // 
@@ -449,6 +475,7 @@ class playGame extends Phaser.Scene {
 
     }
 
+   
     Replay() {
         // replay_count = move_history_array_xOrig_yOrig_xOld_yOld.length - 1
         marker_container.visible = false
