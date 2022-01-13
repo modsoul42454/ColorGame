@@ -145,8 +145,8 @@ class Hud extends Phaser.Scene {
         //  Our Text object to display the Score
         let info = this.add.text(10, 10, 'Score: 0', { font: '18px Arial' });
 
-        let prev_color = this.add.text(10, 30, 'Prev Color', { font: '18px Arial' });
-        let next_color = this.add.text(100, 30, 'Next Color', { font: '18px Arial' });
+        let prev_color = this.add.text(10, 31, 'Prev Color', { font: '18px Arial' });
+        let next_color = this.add.text(100, 31, 'Next Color', { font: '18px Arial' });
         
         next_color.setInteractive()
         next_color.setBackgroundColor('White')
@@ -1089,15 +1089,15 @@ class playGame extends Phaser.Scene {
         if (isLandscape()){
             // width: Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
             // height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
-            this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
-            Math.round(window.innerHeight) -10)
+            this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.08,
+            Math.round(window.innerHeight))
             rect_container.rotation = Math.PI / 2
             rect_container.x = (init_x + num_x * spacer) * 2
             marker_container.rotation = rect_container.rotation
             marker_container.x = rect_container.x
         }else{
-            this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
-            Math.round(window.innerHeight) -10)
+            this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.1,
+            Math.round(window.innerHeight))
             rect_container.rotation = 0
             rect_container.x = 0
             marker_container.rotation = rect_container.rotation
