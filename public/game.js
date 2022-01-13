@@ -3,7 +3,7 @@ window.onload = function () {
         type: Phaser.AUTO,
         backgroundColor: '#000000',
         scale: {
-            mode: Phaser.Scale.FIT,
+            mode: Phaser.Scale.NONE,
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
             width: Math.round(window.innerWidth) - Math.round(window.innerWidth) * .1,
@@ -143,14 +143,15 @@ class Hud extends Phaser.Scene {
 
     create() {
         //  Our Text object to display the Score
-        let info = this.add.text(10, 10, 'Score: 0', { font: '36px Arial' });
+        let info = this.add.text(10, 10, 'Score: 0', { font: '18px Arial' });
 
-        let next_color = this.add.text(10, 50, 'Next Color', { font: '36px Arial' });
+        let prev_color = this.add.text(10, 30, 'Prev Color', { font: '18px Arial' });
+        let next_color = this.add.text(100, 30, 'Next Color', { font: '18px Arial' });
+        
         next_color.setInteractive()
         next_color.setBackgroundColor('White')
         next_color.setFill('black')
         
-        let prev_color = this.add.text(250, 50, 'Prev Color', { font: '36px Arial' });
         prev_color.setBackgroundColor('White')
         prev_color.setFill('black')
         prev_color.setInteractive()
@@ -163,8 +164,7 @@ class Hud extends Phaser.Scene {
         info.setBackgroundColor('White')
         //  Grab a reference to the Game Scene
         ourGame = this.scene.get('PlayGame');
-        ourGame.next_color = next_color
-        ourGame.prev_color = prev_color
+        game.scale.mode = Phaser.Scale.NONE
         this.info = info
         //  Listen for events from it
         ourGame.events.on('addScore', function ({ str_score, direction }) {
