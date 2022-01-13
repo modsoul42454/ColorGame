@@ -3,10 +3,10 @@ window.onload = function () {
         type: Phaser.AUTO,
         backgroundColor: '#000000',
         scale: {
-            mode: Phaser.Scale.FIT,
+            mode: Phaser.Scale.NONE,
             autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
-            width: Math.round(window.innerWidth) - Math.round(window.innerWidth) * .2,
+            width: Math.round(window.innerWidth) - Math.round(window.innerWidth) * .1,
             height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
         },
         physics: {
@@ -1059,23 +1059,23 @@ class playGame extends Phaser.Scene {
 
         }
 
-        // if (isLandscape()){
-        //     // width: Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
-        //     // height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
-        //     this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
-        //     Math.round(window.innerHeight) -10)
-        //     rect_container.rotation = Math.PI / 2
-        //     rect_container.x = (init_x + num_x * spacer) * 2
-        //     marker_container.rotation = rect_container.rotation
-        //     marker_container.x = rect_container.x
-        // }else{
-        //     this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
-        //     Math.round(window.innerHeight) -10)
-        //     rect_container.rotation = 0
-        //     rect_container.x = 0
-        //     marker_container.rotation = rect_container.rotation
-        //     marker_container.x = rect_container.x 
-        // }
+        if (isLandscape()){
+            // width: Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
+            // height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
+            this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
+            Math.round(window.innerHeight) -10)
+            rect_container.rotation = Math.PI / 2
+            rect_container.x = (init_x + num_x * spacer) * 2
+            marker_container.rotation = rect_container.rotation
+            marker_container.x = rect_container.x
+        }else{
+            this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
+            Math.round(window.innerHeight) -10)
+            rect_container.rotation = 0
+            rect_container.x = 0
+            marker_container.rotation = rect_container.rotation
+            marker_container.x = rect_container.x 
+        }
         if (this.frameTime > 200) {
             // this.compute_score_and_save()
             this.frameTime = 0

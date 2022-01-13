@@ -28,7 +28,7 @@
         select {
 
             font-size: xx-large;
-            height: 500px;
+            height: 100px;
             width: 500px;
         }
         
@@ -79,7 +79,7 @@
 
 
     <center>
-    <select class="form-control" id="optList" name="selectbasic" multiple></select>
+    <select class="dropdown" id="optList" name="selectbasic"></select>
     <br>
     <button type="button" id='ForceReoad' onclick="optList.selectedIndex-- ; optList.onchange()"">Prev Cmap</button>
     <button type="button" id='ForceReoad' onclick="optList.selectedIndex++ ; optList.onchange()">Next Cmap</button>
@@ -120,8 +120,7 @@
         <br>
         <label for="Select_Saves">Saves Available</label>
         <br>
-        <select id="Select_Saves" multiple>
-
+        <select id="Select_Saves">
 
 
         </select>
