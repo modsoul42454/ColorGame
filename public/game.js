@@ -313,12 +313,6 @@ class playGame extends Phaser.Scene {
 
     }
 
-    offset_sliderChange() {
-        var slider_offset = document.getElementById("myOffsetVal")
-
-        game.scene.scenes[0].slider_offset_val = parseInt(slider_offset.value)
-
-    }
     getConfirmation() {
         var retVal = confirm("Do you want to randomize the grid ?");
         playGame_class_var
@@ -384,9 +378,9 @@ class playGame extends Phaser.Scene {
         this.input.addPointer(4)
 
         // 
-        var slider_offset = document.getElementById("myOffsetVal")
-        slider_offset.onchange = this.offset_sliderChange
-        this.slider_offset_val = slider_offset.value
+        // var slider_offset = document.getElementById("myOffsetVal")
+        // slider_offset.onchange = this.offset_sliderChange
+        // this.slider_offset_val = slider_offset.value
         
         
         var ResetButton = document.getElementById("ResetButton")
@@ -852,7 +846,7 @@ class playGame extends Phaser.Scene {
                             //console.log({distance_orig})
                         }
                         isDragging = true
-                        this.rect1.y = dragY - this.slider_offset_val //- correction_y
+                        // this.rect1.y = dragY - this.slider_offset_val //- correction_y
 
 
                         var bound_rect = this.cameras.main.worldView
