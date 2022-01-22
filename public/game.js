@@ -469,8 +469,8 @@ class playGame extends Phaser.Scene {
         // var text;
         // ({ count, ii, jj, array_text_jj, array_text_ii, text, ii, jj } = this.newMethod(count, array_text_ii, array_text_jj, ii, jj, text));
 
-        // var delete_button = document.getElementById("Delete_Data")
-        // delete_button.onclick = this.delete_button
+        var delete_button = document.getElementById("Delete_Data")
+        delete_button.onclick = this.delete_button
 
         this.setSave()
         var select_saves = document.getElementById("Select_Saves")
@@ -478,11 +478,11 @@ class playGame extends Phaser.Scene {
         this.ReloadData();
 
     }
-    // delete_button(){
-    //     localStorage.clear()
-    //     document.getElementById("Select_Saves").innerHTML = "";
+    delete_button(){
+        localStorage.clear()
+        document.getElementById("Select_Saves").innerHTML = "";
 
-    // }
+    }
    
     Replay() {
         // replay_count = move_history_array_xOrig_yOrig_xOld_yOld.length - 1
