@@ -257,6 +257,7 @@ class playGame extends Phaser.Scene {
 
         url = 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexpinchplugin.min.js';
         this.load.plugin('rexpinchplugin', url, true);
+        this.load.image('MarkerSprite', 'O_image.png');
     }
 
     change_color() {
@@ -529,20 +530,7 @@ class playGame extends Phaser.Scene {
         marker_container.visible = !marker_container.visible
         marker_container.depth = 1000
     }
-    spreadtiles() {
-        this.max_x = init_x + (num_x) * spacer
-        this.max_y = init_y + (num_y) * spacer
-        for (var ii = 0; ii < num_x; ii++) {
-            for (var jj = 0; jj < num_y; jj++) {
-                if (array_rects[ii][jj].flag_interactive) {
-                    array_rects[ii][jj].x = 2 * (Math.random() - 0.5) * this.max_x / 2
-                    array_rects[ii][jj].y = 2 * (Math.random() - 0.5) * this.max_y / 2
-                }
-            }
-        }
-
-    }
-
+    
     ReloadData() {
         reload_data = true
         var select_saves = document.getElementById("Select_Saves")
@@ -738,6 +726,7 @@ class playGame extends Phaser.Scene {
         rect_container.removeAll()
         marker_container.removeAll()
         this.destroy_child_objects('Text')
+        this.destroy_child_objects('Sprite')
         this.destroy_child_objects('Rectangle')
         this.GenerateInitialGrid()
         var count = 0;
@@ -1046,25 +1035,28 @@ class playGame extends Phaser.Scene {
         for (var ii = 0; ii < num_x; ii++)
             for (var jj = 0; jj < num_y; jj++) {
                 {
-                    distance = Math.sqrt((array_rects[ii][jj].x - array_rects[ii][jj].orig_pos_x) ** 2 + (array_rects[ii][jj].y - array_rects[ii][jj].orig_pos_y) ** 2);
-                    distance = distance / spacer
-                    total_distance += distance;
-                    if (Math.abs(distance) < 0.01) {
-                        correct_num++;
+                    if (array_rects[ii][jj].flag_interactive == true) {
+                        distance = Math.sqrt((array_rects[ii][jj].x - array_rects[ii][jj].orig_pos_x) ** 2 + (array_rects[ii][jj].y - array_rects[ii][jj].orig_pos_y) ** 2);
+                        distance = distance / spacer
+                        total_distance += distance;
+                        if (Math.abs(distance) < 0.01) {
+                            correct_num++;
+                        }
+
+
+                        if (distance == 0 && isDragging == false) {
+                            // var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'o', { color: rgbToHex(0, 0, 0) })
+                            var text = this.add.sprite(array_rects[ii][jj].x, array_rects[ii][jj].y, 'MarkerSprite')
+                            text.depth = 1000
+                            text.setDisplaySize(spacer / 2, spacer / 2)
+                            // rect_container.add(text)
+                            // rect_container.depth = 1
+                            marker_container.add(text)
+                            array_rects[ii][jj].disableInteractive();
+                            array_rects[ii][jj].flag_interactive = false
+                        }
+
                     }
-
-
-                    if (distance == 0 && array_rects[ii][jj].flag_interactive && isDragging == false) {
-                        var text = this.add.text(array_rects[ii][jj].x - spacer / 4, array_rects[ii][jj].y - spacer / 4, 'o', { color: rgbToHex(0, 0, 0) })
-                        rect_container.add(text)
-                        rect_container.depth = 1
-                        marker_container.add(text)
-                        text.depth = 1000
-                        array_rects[ii][jj].disableInteractive();
-                        array_rects[ii][jj].flag_interactive = false
-                    }
-
-
                 }
             }
 
@@ -1086,24 +1078,25 @@ class playGame extends Phaser.Scene {
 
         }
 
-        if (isLandscape()){
-            // width: Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
-            // height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
-            this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.08,
-            Math.round(window.innerHeight))
-            rect_container.rotation = Math.PI / 2
-            rect_container.x = (init_x + num_x * spacer) * 2
-            marker_container.rotation = rect_container.rotation
-            marker_container.x = rect_container.x
-        }else{
-            this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.1,
-            Math.round(window.innerHeight))
-            rect_container.rotation = 0
-            rect_container.x = 0
-            marker_container.rotation = rect_container.rotation
-            marker_container.x = rect_container.x 
-        }
-        if (this.frameTime > 200) {
+        // if (isLandscape()){
+        //     // width: Math.round(window.innerWidth)-Math.round(window.innerWidth)*.2,
+        //     // height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
+        //     this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.08,
+        //     Math.round(window.innerHeight))
+        //     rect_container.rotation = Math.PI / 2
+        //     rect_container.x = (init_x + num_x * spacer) * 2
+        //     marker_container.rotation = rect_container.rotation
+        //     marker_container.x = rect_container.x
+        // }else{
+        //     this.game.scale.setGameSize(Math.round(window.innerWidth)-Math.round(window.innerWidth)*.1,
+        //     Math.round(window.innerHeight))
+        //     rect_container.rotation = 0
+        //     rect_container.x = 0
+        //     marker_container.rotation = rect_container.rotation
+        //     marker_container.x = rect_container.x 
+        // }
+
+        if (this.frameTime > 5000) {
             // this.compute_score_and_save()
             this.frameTime = 0
             time_id_element.innerText = (total_time / 1000).toFixed(0) + ' s'
