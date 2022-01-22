@@ -846,7 +846,7 @@ class playGame extends Phaser.Scene {
                             //console.log({distance_orig})
                         }
                         isDragging = true
-                        // this.rect1.y = dragY - this.slider_offset_val //- correction_y
+                        this.rect1.y = dragY //- this.slider_offset_val //- correction_y
 
 
                         var bound_rect = this.cameras.main.worldView
