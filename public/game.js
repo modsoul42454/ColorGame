@@ -141,13 +141,17 @@ class Hud extends Phaser.Scene {
         document.getElementById("optList").onchange()
     }
 
+    toggle_markers(){
+        document.getElementById("ShowMark").onclick()
+    }
+
     create() {
         //  Our Text object to display the Score
         let info = this.add.text(10, 10, 'Score: 0', { font: '18px Arial' });
 
         let prev_color = this.add.text(10, 31, 'Prev Color', { font: '18px Arial' });
         let next_color = this.add.text(100, 31, 'Next Color', { font: '18px Arial' });
-        
+        let show_markers = this.add.text(10, 61, 'Toggle Markers', { font: '18px Arial' });
         next_color.setInteractive()
         next_color.setBackgroundColor('White')
         next_color.setFill('black')
@@ -156,10 +160,14 @@ class Hud extends Phaser.Scene {
         prev_color.setFill('black')
         prev_color.setInteractive()
 
+        show_markers.setBackgroundColor('White')
+        show_markers.setFill('black')
+        show_markers.setInteractive()
+
 
         next_color.on('pointerdown', () => this.change_color(1) )
         prev_color.on('pointerdown', () => this.change_color(-1) )
-
+        show_markers.on('pointerdown', () => this.toggle_markers() )
         info.setFill('black')
         info.setBackgroundColor('White')
         //  Grab a reference to the Game Scene
@@ -379,32 +387,37 @@ class playGame extends Phaser.Scene {
         var slider_offset = document.getElementById("myOffsetVal")
         slider_offset.onchange = this.offset_sliderChange
         this.slider_offset_val = slider_offset.value
-
-
+        
+        
         var ResetButton = document.getElementById("ResetButton")
         ResetButton.onclick = this.getConfirmation
         
-   
+        
         var replay_button = document.getElementById("NextColor")
         replay_button.onclick = this.Replay
-
+        
         // 
         var ToggleBUtton = document.getElementById("ShowMark")
         ToggleBUtton.onclick = this.toggle_markers
-
+        
         var colormaps = ['Blues', 'BuGn', 'BuPu',
-            'GnBu', 'Greens', 'Greys', 'Oranges', 'OrRd',
-            'PuBu', 'PuBuGn', 'PuRd', 'Purples', 'RdPu',
-            'Reds', 'YlGn', 'YlGnBu', 'YlOrBr', 'YlOrRd', 'afmhot', 'autumn', 'bone', 'cool', 'copper',
-            'gist_heat', 'gray', 'hot', 'pink',
-            'spring', 'summer', 'winter', 'BrBG', 'bwr', 'coolwarm', 'PiYG', 'PRGn', 'PuOr',
-            'RdBu', 'RdGy', 'RdYlBu', 'RdYlGn', 'Spectral',
-            'seismic', 'Accent', 'Dark2', 'Paired', 'Pastel1', 'Pastel2', 'Set1', 'Set2', 'Set3', 'gist_earth', 'terrain', 'ocean', 'gist_stern',
-            'brg', 'CMRmap', 'cubehelix', 'gnuplot',
-            'gnuplot2', 'gist_ncar', 'nipy_spectral',
-            'jet', 'rainbow', 'gist_rainbow', 'hsv',
-            'flag', 'prism']
+        'GnBu', 'Greens', 'Greys', 'Oranges', 'OrRd',
+        'PuBu', 'PuBuGn', 'PuRd', 'Purples', 'RdPu',
+        'Reds', 'YlGn', 'YlGnBu', 'YlOrBr', 'YlOrRd', 'afmhot', 'autumn', 'bone', 'cool', 'copper',
+        'gist_heat', 'gray', 'hot', 'pink',
+        'spring', 'summer', 'winter', 'BrBG', 'bwr', 'coolwarm', 'PiYG', 'PRGn', 'PuOr',
+        'RdBu', 'RdGy', 'RdYlBu', 'RdYlGn', 'Spectral',
+        'seismic', 'Accent', 'Dark2', 'Paired', 'Pastel1', 'Pastel2', 'Set1', 'Set2', 'Set3', 'gist_earth', 'terrain', 'ocean', 'gist_stern',
+        'brg', 'CMRmap', 'cubehelix', 'gnuplot',
+        'gnuplot2', 'gist_ncar', 'nipy_spectral',
+        'jet', 'rainbow', 'gist_rainbow', 'hsv',
+        'flag', 'prism']
         var color_list = document.getElementById("optList")
+        var option = document.createElement("option")
+        option.text = 'Moose'
+        option.value = 'Moose'
+
+        color_list.add(option, 0)
         color_list.onchange = this.change_color
 
         // var color_next = document.getElementById("optList")
@@ -431,18 +444,13 @@ class playGame extends Phaser.Scene {
         //     color_list.add(option, 1)
         // }
 
-        var option = document.createElement("option")
-        option.text = 'Moose'
-        option.value = 'Moose'
-
-        color_list.add(option, 1)
-
+        
         this.ColorMap_to_use = 'Moose'
         if (this.ColorMap_to_use != 'Moose') {
             this.ColorMap_to_use = eval(colormaps[1])
         }
 
-
+        color_list.value = 0
         var Num_x_input = document.getElementById("num_x_id")
         var Num_y_input = document.getElementById("num_y_id")
         var test_num_x = JSON.parse(localStorage.getItem('num_x'));
@@ -452,7 +460,8 @@ class playGame extends Phaser.Scene {
         }
 
         this.GenerateInitialGrid();
-
+        // this.RandomizeGrid()
+        this.compute_score_and_save();
         this.input.on('pointerdown', this.PointerDown, this)
         // this.input.on('pointer2down', this.pointer2_down, this)
         
@@ -466,8 +475,8 @@ class playGame extends Phaser.Scene {
         // var text;
         // ({ count, ii, jj, array_text_jj, array_text_ii, text, ii, jj } = this.newMethod(count, array_text_ii, array_text_jj, ii, jj, text));
 
-        var Spread_button = document.getElementById("Spread_button")
-        Spread_button.onclick = this.spreadtiles
+        // var delete_button = document.getElementById("Delete_Data")
+        // delete_button.onclick = this.delete_button
 
         this.setSave()
         var select_saves = document.getElementById("Select_Saves")
@@ -475,7 +484,11 @@ class playGame extends Phaser.Scene {
         this.ReloadData();
 
     }
+    // delete_button(){
+    //     localStorage.clear()
+    //     document.getElementById("Select_Saves").innerHTML = "";
 
+    // }
    
     Replay() {
         // replay_count = move_history_array_xOrig_yOrig_xOld_yOld.length - 1
@@ -664,6 +677,7 @@ class playGame extends Phaser.Scene {
         marker_container.visible = true
         // return
         this.destroy_child_objects('Text')
+        this.destroy_child_objects('Sprite')
         this.destroy_child_objects('Rectangle')
         var ColorMap_to_use = this.ColorMap_to_use
         var count = 0
@@ -673,6 +687,7 @@ class playGame extends Phaser.Scene {
 
         this.max_x = init_x + (num_x) * spacer
         this.max_y = init_y + (num_y) * spacer
+        
         for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
 
@@ -926,39 +941,39 @@ class playGame extends Phaser.Scene {
             rect_in.last_pos_y = rect_in.y
 
         }
-        else if (!sub_found) {
-            var move_log1 = []
+        // else if (!sub_found) {
+        //     var move_log1 = []
             
-            rect_in.x = Math.round(rect_in.x / spacer) * spacer
-            rect_in.y = Math.round(rect_in.y / spacer) * spacer
-            this.AddToMoveHistory(rect_in);
+        //     rect_in.x = Math.round(rect_in.x / spacer) * spacer
+        //     rect_in.y = Math.round(rect_in.y / spacer) * spacer
+        //     this.AddToMoveHistory(rect_in);
             
 
 
-            rect_in.last_pos_x = rect_in.x
-            rect_in.last_pos_y = rect_in.y
-        }
+        //     rect_in.last_pos_x = rect_in.x
+        //     rect_in.last_pos_y = rect_in.y
+        // }
 
         else {
 
 
-            if (rect_in.x > init_x + num_x * spacer || rect_in.y > init_y + num_y * spacer) {
+            // if (rect_in.x > init_x + num_x * spacer || rect_in.y > init_y + num_y * spacer) {
             
 
-                rect_in.x = Math.round(rect_in.x / spacer) * spacer
-                rect_in.y = Math.round(rect_in.y / spacer) * spacer
-                rect_in.last_pos_x = rect_in.x
-                rect_in.last_pos_y = rect_in.y
-                this.AddToMoveHistory(rect_in);
-            }
-            else {
+            //     rect_in.x = Math.round(rect_in.x / spacer) * spacer
+            //     rect_in.y = Math.round(rect_in.y / spacer) * spacer
+            //     rect_in.last_pos_x = rect_in.x
+            //     rect_in.last_pos_y = rect_in.y
+            //     this.AddToMoveHistory(rect_in);
+            // }
+            // else {
                 rect_in.x = rect_in.last_pos_x
                 rect_in.y = rect_in.last_pos_y
 
                 rect_in.last_pos_x = rect_in.x
                 rect_in.last_pos_y = rect_in.y
                 this.AddToMoveHistory(rect_in);
-            }
+            // }
 
 
         }
@@ -1028,7 +1043,7 @@ class playGame extends Phaser.Scene {
 
     }
 
-    compute_score_and_save() {
+        compute_score_and_save() {
         var total_distance = 0.0;
         correct_num = 0
         var distance
