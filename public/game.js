@@ -3,11 +3,11 @@ window.onload = function () {
         type: Phaser.AUTO,
         backgroundColor: '#000000',
         scale: {
-            mode: Phaser.Scale.NONE,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
+            mode: Phaser.Scale.FIT ,
+            // autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
-            width: Math.round(window.innerWidth) - Math.round(window.innerWidth) * .1,
-            height: Math.round(window.innerHeight) -10//- Math.round(window.innerHeight)*0.2
+            width: Math.round(window.innerWidth) - Math.round(window.innerWidth) * .2,
+            height: Math.round(window.innerHeight)//- Math.round(window.innerHeight)*0.2
         },
         physics: {
             default: "arcade",
@@ -145,6 +145,24 @@ class Hud extends Phaser.Scene {
         document.getElementById("ShowMark").onclick()
     }
 
+    toggle_fullscreen(){
+
+        if (game.scale.isFullscreen)
+        {
+            game.scale.mode = Phaser.Scale.FIT    
+            game.scale.stopFullscreen();
+        }
+        
+        else
+        {
+            game.scale.mode = Phaser.Scale.RESIZE
+            game.scale.startFullscreen();
+            
+        }
+
+    }
+
+
     create() {
         //  Our Text object to display the Score
         let info = this.add.text(10, 10, 'Score: 0', { font: '18px Arial' });
@@ -152,9 +170,12 @@ class Hud extends Phaser.Scene {
         let prev_color = this.add.text(10, 31, 'Prev Color', { font: '18px Arial' });
         let next_color = this.add.text(100, 31, 'Next Color', { font: '18px Arial' });
         let show_markers = this.add.text(10, 61, 'Toggle Markers', { font: '18px Arial' });
+        let full_screen = this.add.text(150, 61, ' Toggle Fullscreen', { font: '18px Arial' });
         next_color.setInteractive()
         next_color.setBackgroundColor('White')
         next_color.setFill('black')
+        
+
         
         prev_color.setBackgroundColor('White')
         prev_color.setFill('black')
@@ -164,10 +185,15 @@ class Hud extends Phaser.Scene {
         show_markers.setFill('black')
         show_markers.setInteractive()
 
+        full_screen.setBackgroundColor('White')
+        full_screen.setFill('black')
+        full_screen.setInteractive()
 
         next_color.on('pointerdown', () => this.change_color(1) )
         prev_color.on('pointerdown', () => this.change_color(-1) )
         show_markers.on('pointerdown', () => this.toggle_markers() )
+        full_screen.on('pointerdown', () => this.toggle_fullscreen() )
+
         info.setFill('black')
         info.setBackgroundColor('White')
         //  Grab a reference to the Game Scene
@@ -1065,6 +1091,9 @@ class playGame extends Phaser.Scene {
                             array_rects[ii][jj].flag_interactive = false
                         }
 
+                    }
+                    else{
+                        correct_num++
                     }
                 }
             }
