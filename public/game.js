@@ -3,7 +3,7 @@ window.onload = function () {
         type: Phaser.AUTO,
         backgroundColor: '#000000',
         scale: {
-            mode: Phaser.Scale.FIT ,
+            mode: Phaser.Scale.FIT,
             // autoCenter: Phaser.Scale.CENTER_BOTH,
             parent: "thegame",
             width: Math.round(window.innerWidth) - Math.round(window.innerWidth) * .2,
@@ -55,7 +55,7 @@ var distance_orig = 0
 var time_id_element = document.getElementById('time_id')
 var replay_count = -1
 
-function change_save(){
+function change_save() {
     ourGame.ReloadData()
 }
 
@@ -134,30 +134,28 @@ class Hud extends Phaser.Scene {
         this.score = 0;
     }
 
-    change_color(dir){
+    change_color(dir) {
         document.getElementById("optList").selectedIndex += dir
-        document.getElementById("optList").selectedIndex = Math.max( document.getElementById("optList").selectedIndex,0  )
+        document.getElementById("optList").selectedIndex = Math.max(document.getElementById("optList").selectedIndex, 0)
         // document.getElementById("optList").selectedIndex = Math.max( document.getElementById("optList").Item,0  )
         document.getElementById("optList").onchange()
     }
 
-    toggle_markers(){
+    toggle_markers() {
         document.getElementById("ShowMark").onclick()
     }
 
-    toggle_fullscreen(){
+    toggle_fullscreen() {
 
-        if (game.scale.isFullscreen)
-        {
-            game.scale.mode = Phaser.Scale.FIT    
+        if (game.scale.isFullscreen) {
+            game.scale.mode = Phaser.Scale.FIT
             game.scale.stopFullscreen();
         }
-        
-        else
-        {
+
+        else {
             game.scale.mode = Phaser.Scale.RESIZE
             game.scale.startFullscreen();
-            
+
         }
 
     }
@@ -174,9 +172,9 @@ class Hud extends Phaser.Scene {
         next_color.setInteractive()
         next_color.setBackgroundColor('White')
         next_color.setFill('black')
-        
 
-        
+
+
         prev_color.setBackgroundColor('White')
         prev_color.setFill('black')
         prev_color.setInteractive()
@@ -189,10 +187,10 @@ class Hud extends Phaser.Scene {
         full_screen.setFill('black')
         full_screen.setInteractive()
 
-        next_color.on('pointerdown', () => this.change_color(1) )
-        prev_color.on('pointerdown', () => this.change_color(-1) )
-        show_markers.on('pointerdown', () => this.toggle_markers() )
-        full_screen.on('pointerdown', () => this.toggle_fullscreen() )
+        next_color.on('pointerdown', () => this.change_color(1))
+        prev_color.on('pointerdown', () => this.change_color(-1))
+        show_markers.on('pointerdown', () => this.toggle_markers())
+        full_screen.on('pointerdown', () => this.toggle_fullscreen())
 
         info.setFill('black')
         info.setBackgroundColor('White')
@@ -333,7 +331,7 @@ class playGame extends Phaser.Scene {
 
 
         // localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
-        if (ourGame.GameStartTime != null){
+        if (ourGame.GameStartTime != null) {
             ourGame.SaveGame()
         }
 
@@ -345,26 +343,26 @@ class playGame extends Phaser.Scene {
         if (retVal == true) {
 
             playGame_class_var.RandomizeGrid()
-            playGame_class_var.destroy_child_objects('Text')
+            // playGame_class_var.destroy_child_objects('Text')
             playGame_class_var.post_randomization_clean_up_cycles = 30
             return true;
         }
     }
 
 
-    setSave()
-    {
+    setSave() {
         var select_saves = document.getElementById("Select_Saves")
         var save_keys = Object.keys(localStorage)
         while (select_saves.options.length > 0) {
             select_saves.remove(0);
         }
-        for (var save_key in save_keys){
-            if ( save_keys[save_key].includes("Time") ){
+        for (var save_key in save_keys) {
+            if (save_keys[save_key].includes("Time")) {
                 var opt = document.createElement('option');
                 opt.value = save_keys[save_key];
                 opt.innerHTML = save_keys[save_key];
-                select_saves.appendChild(opt)}
+                select_saves.appendChild(opt)
+            }
         }
         select_saves.onchange = change_save
     }
@@ -380,6 +378,25 @@ class playGame extends Phaser.Scene {
         this.dragScale.dragThreshold = 1
         this.frameTime = 0
         isDragging = false
+
+        // this.find_and_swap = this.find_and_swap_orig
+
+
+        let toggle_debug = this.add.text(0, 400, 'Toggle Debug', { font: '18px Arial' });
+        toggle_debug.setInteractive()
+        toggle_debug.setBackgroundColor('White')
+        toggle_debug.setFill('black')
+        toggle_debug.setDepth(10000)
+        this.find_and_swap_debug = false
+        var current_object = this
+        toggle_debug.on('pointerdown', function () {
+
+            current_object.find_and_swap_debug = !current_object.find_and_swap_debug
+        }
+
+        )
+
+
         this.dragScale
             .on('pinch', function (dragScale) {
                 if (!this.dragObj === null) {
@@ -407,31 +424,31 @@ class playGame extends Phaser.Scene {
         // var slider_offset = document.getElementById("myOffsetVal")
         // slider_offset.onchange = this.offset_sliderChange
         // this.slider_offset_val = slider_offset.value
-        
-        
+
+
         var ResetButton = document.getElementById("ResetButton")
         ResetButton.onclick = this.getConfirmation
-        
-        
+
+
         var replay_button = document.getElementById("NextColor")
         replay_button.onclick = this.Replay
-        
+
         // 
         var ToggleBUtton = document.getElementById("ShowMark")
         ToggleBUtton.onclick = this.toggle_markers
-        
+
         var colormaps = ['Blues', 'BuGn', 'BuPu',
-        'GnBu', 'Greens', 'Greys', 'Oranges', 'OrRd',
-        'PuBu', 'PuBuGn', 'PuRd', 'Purples', 'RdPu',
-        'Reds', 'YlGn', 'YlGnBu', 'YlOrBr', 'YlOrRd', 'afmhot', 'autumn', 'bone', 'cool', 'copper',
-        'gist_heat', 'gray', 'hot', 'pink',
-        'spring', 'summer', 'winter', 'BrBG', 'bwr', 'coolwarm', 'PiYG', 'PRGn', 'PuOr',
-        'RdBu', 'RdGy', 'RdYlBu', 'RdYlGn', 'Spectral',
-        'seismic', 'Accent', 'Dark2', 'Paired', 'Pastel1', 'Pastel2', 'Set1', 'Set2', 'Set3', 'gist_earth', 'terrain', 'ocean', 'gist_stern',
-        'brg', 'CMRmap', 'cubehelix', 'gnuplot',
-        'gnuplot2', 'gist_ncar', 'nipy_spectral',
-        'jet', 'rainbow', 'gist_rainbow', 'hsv',
-        'flag', 'prism']
+            'GnBu', 'Greens', 'Greys', 'Oranges', 'OrRd',
+            'PuBu', 'PuBuGn', 'PuRd', 'Purples', 'RdPu',
+            'Reds', 'YlGn', 'YlGnBu', 'YlOrBr', 'YlOrRd', 'afmhot', 'autumn', 'bone', 'cool', 'copper',
+            'gist_heat', 'gray', 'hot', 'pink',
+            'spring', 'summer', 'winter', 'BrBG', 'bwr', 'coolwarm', 'PiYG', 'PRGn', 'PuOr',
+            'RdBu', 'RdGy', 'RdYlBu', 'RdYlGn', 'Spectral',
+            'seismic', 'Accent', 'Dark2', 'Paired', 'Pastel1', 'Pastel2', 'Set1', 'Set2', 'Set3', 'gist_earth', 'terrain', 'ocean', 'gist_stern',
+            'brg', 'CMRmap', 'cubehelix', 'gnuplot',
+            'gnuplot2', 'gist_ncar', 'nipy_spectral',
+            'jet', 'rainbow', 'gist_rainbow', 'hsv',
+            'flag', 'prism']
         var color_list = document.getElementById("optList")
         var option = document.createElement("option")
         option.text = 'Moose'
@@ -464,7 +481,7 @@ class playGame extends Phaser.Scene {
         //     color_list.add(option, 1)
         // }
 
-        
+
         this.ColorMap_to_use = 'Moose'
         if (this.ColorMap_to_use != 'Moose') {
             this.ColorMap_to_use = eval(colormaps[1])
@@ -484,8 +501,8 @@ class playGame extends Phaser.Scene {
         this.compute_score_and_save();
         this.input.on('pointerdown', this.PointerDown, this)
         // this.input.on('pointer2down', this.pointer2_down, this)
-        
-        
+
+
         this.change_color();
         // var count;
         // var ii;
@@ -504,12 +521,11 @@ class playGame extends Phaser.Scene {
         this.ReloadData();
 
     }
-    delete_button(){
+    delete_button() {
         localStorage.clear()
         document.getElementById("Select_Saves").innerHTML = "";
 
     }
-   
     Replay() {
         // replay_count = move_history_array_xOrig_yOrig_xOld_yOld.length - 1
         marker_container.visible = false
@@ -530,7 +546,7 @@ class playGame extends Phaser.Scene {
         console.log('Doing Replay')
         // move_history_array_xOrig_yOrig_xOld_yOld
         // var move_xOrig_yOrig_xNew_yNew = move_history_array_xOrig_yOrig_xOld_yOld[
-            // move_history_array_xOrig_yOrig_xOld_yOld.length - replay_count - 1]
+        // move_history_array_xOrig_yOrig_xOld_yOld.length - replay_count - 1]
 
 
 
@@ -549,7 +565,7 @@ class playGame extends Phaser.Scene {
                     if (replay_count == -1) {
                         this.ReloadData()
                         marker_container.visible = true
-                        
+
                     }
                     return
 
@@ -563,20 +579,19 @@ class playGame extends Phaser.Scene {
         marker_container.visible = !marker_container.visible
         marker_container.depth = 1000
     }
-    
+
     ReloadData() {
         reload_data = true
         var select_saves = document.getElementById("Select_Saves")
         var save_keys = Object.keys(localStorage)
-        if (select_saves.selectedIndex == -1){
+        if (select_saves.selectedIndex == -1) {
             select_saves.selectedIndex = 0
             reload_data = false
             // return
         }
-        else
-        {
+        else {
             var save_data = JSON.parse(localStorage.getItem(select_saves[select_saves.selectedIndex].value))
-        
+
         }
         // var recover_array = JSON.parse(localStorage.getItem('Array'));
         if (save_data == null) {
@@ -594,11 +609,11 @@ class playGame extends Phaser.Scene {
                 Num_y_input.value = save_data.num_y
                 rect_container.removeAll()
                 marker_container.removeAll()
-                this.destroy_child_objects('Text')
+                // this.destroy_child_objects('Text')
                 this.destroy_child_objects('Rectangle')
                 this.GenerateInitialGrid()
 
-                var recover_array =  save_data.Array
+                var recover_array = save_data.Array
                 var recover_colormap = save_data.colormap_val
                 // move_history_array_xOrig_yOrig_xOld_yOld = save_data.move_history_array_xOld_yOld_xNew_yNew
 
@@ -696,7 +711,7 @@ class playGame extends Phaser.Scene {
         marker_container.depth = 1000
         marker_container.visible = true
         // return
-        this.destroy_child_objects('Text')
+        // this.destroy_child_objects('Text')
         this.destroy_child_objects('Sprite')
         this.destroy_child_objects('Rectangle')
         var ColorMap_to_use = this.ColorMap_to_use
@@ -707,7 +722,7 @@ class playGame extends Phaser.Scene {
 
         this.max_x = init_x + (num_x) * spacer
         this.max_y = init_y + (num_y) * spacer
-        
+
         for (var ii = 0; ii < num_x; ii++) {
             for (var jj = 0; jj < num_y; jj++) {
 
@@ -760,7 +775,7 @@ class playGame extends Phaser.Scene {
     RandomizeGrid() {
         rect_container.removeAll()
         marker_container.removeAll()
-        this.destroy_child_objects('Text')
+        // this.destroy_child_objects('Text')
         this.destroy_child_objects('Sprite')
         this.destroy_child_objects('Rectangle')
         this.GenerateInitialGrid()
@@ -830,10 +845,10 @@ class playGame extends Phaser.Scene {
 
         // move_history_array_xOrig_yOrig_xOld_yOld = []
         total_time = 0
-        
-        this.destroy_child_objects('Text')
+
+        // this.destroy_child_objects('Text')
         var color_list = document.getElementById("optList")
-        
+
         color_list.onchange()
         this.compute_score_and_save()
         marker_container.visible = true
@@ -916,94 +931,179 @@ class playGame extends Phaser.Scene {
 
     }
 
-
     find_and_swap(rect_in, game_fully_initialized = false) {
 
+        if (this.find_and_swap_debug) {
+            var new_x = Math.round(rect_in.x / spacer) * spacer
+            var new_y = Math.round(rect_in.y / spacer) * spacer
+            var sub_found = false
 
-        var new_x = Math.round(rect_in.x / spacer) * spacer
-        var new_y = Math.round(rect_in.y / spacer) * spacer
-        var sub_found = false
 
 
+            for (var ii = 0; ii < num_x; ii++) {
+                for (var jj = 0; jj < num_y; jj++) {
+                    if (array_rects[ii][jj] != rect_in & equals(array_rects[ii][jj].x, new_x) & equals(array_rects[ii][jj].y, new_y)) {
+                        var intersected_array = array_rects[ii][jj]
+                        sub_found = true
+                        break
 
-        for (var ii = 0; ii < num_x; ii++) {
-            for (var jj = 0; jj < num_y; jj++) {
-                if (array_rects[ii][jj] != rect_in & equals(array_rects[ii][jj].x, new_x) & equals(array_rects[ii][jj].y, new_y)) {
-                    var intersected_array = array_rects[ii][jj]
-                    sub_found = true
-                    break
-
+                    }
                 }
             }
+
+
+            if (sub_found && intersected_array.flag_interactive) {
+
+                intersected_array.x = rect_in.last_pos_x
+                intersected_array.y = rect_in.last_pos_y
+                this.AddToMoveHistory(intersected_array);
+
+
+
+                intersected_array.last_pos_x = intersected_array.x
+                intersected_array.last_pos_y = intersected_array.y
+
+
+
+
+
+                rect_in.x = Math.round(rect_in.x / spacer) * spacer
+                rect_in.y = Math.round(rect_in.y / spacer) * spacer
+                this.AddToMoveHistory(rect_in);
+
+                rect_in.last_pos_x = rect_in.x
+                rect_in.last_pos_y = rect_in.y
+
+            }
+            else if (!sub_found) {
+                var move_log1 = []
+
+                rect_in.x = Math.round(rect_in.x / spacer) * spacer
+                rect_in.y = Math.round(rect_in.y / spacer) * spacer
+                this.AddToMoveHistory(rect_in);
+
+
+
+                rect_in.last_pos_x = rect_in.x
+                rect_in.last_pos_y = rect_in.y
+            }
+
+            else {
+
+
+                if (rect_in.x > init_x + num_x * spacer || rect_in.y > init_y + num_y * spacer) {
+
+
+                    rect_in.x = Math.round(rect_in.x / spacer) * spacer
+                    rect_in.y = Math.round(rect_in.y / spacer) * spacer
+                    rect_in.last_pos_x = rect_in.x
+                    rect_in.last_pos_y = rect_in.y
+                    this.AddToMoveHistory(rect_in);
+                }
+                else {
+                    rect_in.x = rect_in.last_pos_x
+                    rect_in.y = rect_in.last_pos_y
+
+                    rect_in.last_pos_x = rect_in.x
+                    rect_in.last_pos_y = rect_in.y
+                    this.AddToMoveHistory(rect_in);
+                }
+
+
+            }
+            if (game_fully_initialized) {
+                this.SaveGame();
+
+
+            }
         }
-
-
-        if (sub_found && intersected_array.flag_interactive) {
-
-            intersected_array.x = rect_in.last_pos_x
-            intersected_array.y = rect_in.last_pos_y
-            this.AddToMoveHistory(intersected_array);
-
-
-
-            intersected_array.last_pos_x = intersected_array.x
-            intersected_array.last_pos_y = intersected_array.y
-
-
-
-        
-
-            rect_in.x = Math.round(rect_in.x / spacer) * spacer
-            rect_in.y = Math.round(rect_in.y / spacer) * spacer
-            this.AddToMoveHistory(rect_in);
-            
-            rect_in.last_pos_x = rect_in.x
-            rect_in.last_pos_y = rect_in.y
-
-        }
-        // else if (!sub_found) {
-        //     var move_log1 = []
-            
-        //     rect_in.x = Math.round(rect_in.x / spacer) * spacer
-        //     rect_in.y = Math.round(rect_in.y / spacer) * spacer
-        //     this.AddToMoveHistory(rect_in);
-            
-
-
-        //     rect_in.last_pos_x = rect_in.x
-        //     rect_in.last_pos_y = rect_in.y
-        // }
-
         else {
 
 
-            // if (rect_in.x > init_x + num_x * spacer || rect_in.y > init_y + num_y * spacer) {
-            
+            var new_x = Math.round(rect_in.x / spacer) * spacer
+            var new_y = Math.round(rect_in.y / spacer) * spacer
+            var sub_found = false
+
+
+
+            for (var ii = 0; ii < num_x; ii++) {
+                for (var jj = 0; jj < num_y; jj++) {
+                    if (array_rects[ii][jj] != rect_in & equals(array_rects[ii][jj].x, new_x) & equals(array_rects[ii][jj].y, new_y)) {
+                        var intersected_array = array_rects[ii][jj]
+                        sub_found = true
+                        break
+
+                    }
+                }
+            }
+
+
+            if (sub_found && intersected_array.flag_interactive) {
+
+                intersected_array.x = rect_in.last_pos_x
+                intersected_array.y = rect_in.last_pos_y
+                this.AddToMoveHistory(intersected_array);
+
+
+
+                intersected_array.last_pos_x = intersected_array.x
+                intersected_array.last_pos_y = intersected_array.y
+
+
+
+
+
+                rect_in.x = Math.round(rect_in.x / spacer) * spacer
+                rect_in.y = Math.round(rect_in.y / spacer) * spacer
+                this.AddToMoveHistory(rect_in);
+
+                rect_in.last_pos_x = rect_in.x
+                rect_in.last_pos_y = rect_in.y
+
+            }
+            // else if (!sub_found) {
+            //     var move_log1 = []
 
             //     rect_in.x = Math.round(rect_in.x / spacer) * spacer
             //     rect_in.y = Math.round(rect_in.y / spacer) * spacer
+            //     this.AddToMoveHistory(rect_in);
+
+
+
             //     rect_in.last_pos_x = rect_in.x
             //     rect_in.last_pos_y = rect_in.y
-            //     this.AddToMoveHistory(rect_in);
             // }
-            // else {
+
+            else {
+
+
+                // if (rect_in.x > init_x + num_x * spacer || rect_in.y > init_y + num_y * spacer) {
+
+
+                //     rect_in.x = Math.round(rect_in.x / spacer) * spacer
+                //     rect_in.y = Math.round(rect_in.y / spacer) * spacer
+                //     rect_in.last_pos_x = rect_in.x
+                //     rect_in.last_pos_y = rect_in.y
+                //     this.AddToMoveHistory(rect_in);
+                // }
+                // else {
                 rect_in.x = rect_in.last_pos_x
                 rect_in.y = rect_in.last_pos_y
 
                 rect_in.last_pos_x = rect_in.x
                 rect_in.last_pos_y = rect_in.y
                 this.AddToMoveHistory(rect_in);
-            // }
+                // }
 
 
-        }
-        if (game_fully_initialized) {
-            this.SaveGame();
+            }
+            if (game_fully_initialized) {
+                this.SaveGame();
 
 
+            }
         }
     }
-
     AddToMoveHistory(intersected_array) {
         var move_log1 = [];
         move_log1[0] = intersected_array.orig_pos_x;
@@ -1011,11 +1111,11 @@ class playGame extends Phaser.Scene {
         move_log1[2] = intersected_array.x;
         move_log1[3] = intersected_array.y;
         // move_history_array_xOrig_yOrig_xOld_yOld.push(move_log1);
-     
+
     }
 
     SaveGame() {
-        if (this.GameStartTime == null){
+        if (this.GameStartTime == null) {
             return
         }
         this.compute_score_and_save();
@@ -1034,14 +1134,14 @@ class playGame extends Phaser.Scene {
         var save_data = {}
 
 
-        
 
-        
+
+
         save_data.Array = array_rects_to_save
         // localStorage.setItem('Array', string_data);
-        
+
         var color_list = document.getElementById("optList");
-        
+
         save_data.colormap_val = color_list.selectedIndex
         save_data.total_time = total_time
         // localStorage.setItem('colormap_val', JSON.stringify(color_list.selectedIndex));
@@ -1058,12 +1158,12 @@ class playGame extends Phaser.Scene {
         // localStorage.setItem('num_y', JSON.stringify(num_y));
         // localStorage.setItem('move_history_array_xOld_yOld_xNew_yNew', JSON.stringify(move_history_array_xOrig_yOrig_xOld_yOld))
         save_data.GameStartTime = this.GameStartTime
-        localStorage.setItem(this.GameStartTime,JSON.stringify(save_data))
+        localStorage.setItem(this.GameStartTime, JSON.stringify(save_data))
 
 
     }
 
-        compute_score_and_save() {
+    compute_score_and_save() {
         var total_distance = 0.0;
         correct_num = 0
         var distance
@@ -1092,7 +1192,7 @@ class playGame extends Phaser.Scene {
                         }
 
                     }
-                    else{
+                    else {
                         correct_num++
                     }
                 }
