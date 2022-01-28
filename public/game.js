@@ -382,7 +382,7 @@ class playGame extends Phaser.Scene {
         // this.find_and_swap = this.find_and_swap_orig
 
 
-        let toggle_debug = this.add.text(0, 400, 'Toggle Debug', { font: '18px Arial' });
+        let toggle_debug = this.add.text(0, -100, 'Toggle Debug', { font: '18px Arial' });
         toggle_debug.setInteractive()
         toggle_debug.setBackgroundColor('White')
         toggle_debug.setFill('black')
@@ -392,6 +392,16 @@ class playGame extends Phaser.Scene {
         toggle_debug.on('pointerdown', function () {
 
             current_object.find_and_swap_debug = !current_object.find_and_swap_debug
+
+            if (current_object.find_and_swap_debug)
+            {
+                this.setBackgroundColor('Red')
+            } 
+            else
+            {
+                this.setBackgroundColor('White')
+
+            }
         }
 
         )
